@@ -52,71 +52,7 @@
             
             
             <div class="pt-4">
-                <ul 
-                    class="paragraph"
-                    data-index="{{ form.paragraphPosts|length > 0 ? form.paragraphPosts|last.vars.name + 1 : 0 }}"
-                    data-prototype="{{ form_widget(form.paragraphPosts.vars.prototype)|e('html_attr') }}"
-                >   
-                {% for paragraph in form.paragraphPosts %}
-                
-                <li class="h-auto mb-8 border border-gray-200">
-                    {{ form_row(paragraph.subtitle) }}
-                    <div>
-                        <button type="button" class="button__chatGpt" onclick="submitChatGptForm('{{ keyChatGpt }}', '{{ paragraph.subtitle.vars.value }}', '{{ paragraph.vars.id }}')">Remplir le paragraphe avec ChatGPT</button>
-                    </div>
-                    {{ form_row(paragraph.paragraph) }}
-                    {% if paragraph.vars.value.getImgPost() is not empty %}
-                    <img src="{{ paragraph.vars.value.getImgPost() }}" alt="imgHeader">
-                    {% endif %}
-                    {{ form_row(paragraph.imgPostParaghFile) }}
-                    {{ form_widget(paragraph.altImg) }}
-                    <div>
-                        {% if paragraph.vars.value.getLinkSubtitle() is empty %}
-                            <div style="display: none;">
-                                {{ form_widget(paragraph.linkSubtitle) }}
-                                {{ form_row(paragraph.deleteLink) }}
-                            </div>
-                        {% else %}
-                            {{ form_widget(paragraph.linkSubtitle) }}
-                            {{ form_row(paragraph.deleteLink) }}
 
-                            {% endif %}
-                            {{ form_widget(paragraph.linkPostSelect) }}
-                    </div>
-                    
-                    <div>
-
-                    </div>
-                </li>
-                {% endfor %}
-                </ul>
-                <div class="flex text-lg border-gray-600 border-b button_paragraph ">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
-                      </svg>              
-                      Ajouter un paragraphe
-                </div>
-            </div>
-
-            <ul 
-                class="list"
-                data-index="{{ form.listPosts|length > 0 ? form.listPosts|last.vars.name + 0 : 0 }}"
-                data-prototype="{{ form_widget(form.listPosts.vars.prototype)|e('html_attr') }}"
-            >   
-                {% for tag in form.listPosts %}
-                    <li>
-                        {{ form_row(tag) }}
-                    </li>
-
-                {% endfor %}
-            </ul>
-
-            <div class="flex text-lg border-gray-600 border-b button__list pt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                  </svg>
-                  Ajouter une liste
-                </div>  
 
 
             <div class="add__link hidden">

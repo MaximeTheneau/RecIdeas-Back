@@ -14,6 +14,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
+        "google/cloud-translate": "^1.18",
         "lexik/jwt-authentication-bundle": "*",
         "liip/imagine-bundle": "^2.11",
         "michelf/php-markdown": "^2.0",

@@ -162,15 +162,6 @@ class PostsType extends AbstractType
                         'maxlength' => '255',
                     ]
                     ])
-            ->add('paragraphPosts', CollectionType::class, [
-                'entry_type' => ParagraphPostsType::class,
-                'label' => false,
-                'required' => false,
-                'entry_options' => ['label' => false],
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-            ])
             ->add('translations', CollectionType::class, [
                 'entry_type' => PostTranslationType::class,
                 'allow_add' => true,
@@ -181,7 +172,6 @@ class PostsType extends AbstractType
             ;
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();
-                    $listPosts = $event->getData()->getParagraphPosts();
                 });
     }
     

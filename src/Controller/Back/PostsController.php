@@ -9,7 +9,6 @@ use App\Entity\ParagraphPosts;
 use App\Entity\Keyword;
 use App\Entity\PostsTranslation;
 use App\Form\PostsType;
-use App\Form\ParagraphPostsType;
 use App\Message\TriggerNextJsBuild;
 use App\Repository\PostsRepository;
 use App\Repository\CategoryRepository;
@@ -231,19 +230,13 @@ class PostsController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
+    public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
     {
         $imgPost = $post->getImgPost();
         
         $articles = $postsRepository->findAll();
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
-
-        $paragraphPosts = $paragraphPostsRepository->find($id);
-        
-        
-        $formParagraph = $this->createForm(ParagraphPostsType::class, $paragraphPosts);
-        $formParagraph->handleRequest($request);
 
         $postExist = $postsRepository->find($id);
 
@@ -272,88 +265,6 @@ class PostsController extends AbstractController
                 $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
             } else {
                 $post->setImgPost($imgPost);
-            }
-
-            // PARAGRAPH
-            $paragraphPosts = $form->get('paragraphPosts')->getData();
-
-            foreach ($paragraphPosts as $paragraph) {
-
-                // MARKDOWN TO HTML
-                $markdownText = $paragraph->getParagraph();
-
-                $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
-
-                $paragraph->setParagraph($htmlText);
-
-                // LINK
-                $articleLink = $paragraph->getLinkPostSelect();
-                if ($articleLink !== null) {
-                    
-                    $paragraph->setLinkSubtitle($articleLink->getTitle());
-                    $slugLink = $articleLink->getSlug();
-
-                    $categoryLink = $articleLink->getCategory()->getSlug();
-                    if ($categoryLink === "Pages") {
-                        $paragraph->setLink('/'.$slugLink);
-                    }                     
-                    if ($categoryLink === "Annuaire") {
-                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
-                    } 
-                    if ($categoryLink === "Articles") {
-                        $subcategoryLink = $articleLink->getSubcategory()->getSlug();
-                        $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
-                    }
-                } 
-
-              
-                
-                // $deletedLink = $form['paragraphPosts'];
-
-                // if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
-                //     $paragraph->setLink(null);
-                //     $paragraph->setLinkSubtitle(null);
-                // }
-
-                // SLUG
-                if (!empty($paragraph->getSubtitle())) {
-                    $slugPara = $this->slugger->slug($paragraph->getSubtitle());
-                    $slugPara = substr($slugPara, 0, 30); 
-                    $paragraph->setSlug($slugPara);
-
-                } else {
-                    $this->entityManager->remove($paragraph);
-                    $this->entityManager->flush();
-                    }
-
-                // IMAGE PARAGRAPH
-                if (!empty($paragraph->getImgPostParaghFile())) {
-                    $brochureFileParagraph = $paragraph->getImgPostParaghFile();
-                    $slugPara = $this->slugger->slug($paragraph->getSubtitle());
-                    $slugPara = substr($slugPara, 0, 30);
-                    $paragraph->setImgPostParagh($slugPara);
-                    $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
-                    
-                    // ALT IMG PARAGRAPH
-                    if (empty($paragraph->getAltImg())) {
-                        $paragraph->setAltImg($paragraph->getSubtitle());
-                    } 
-                }
-            } 
-            
-            $listPosts = $post->getListPosts();
-            if ($listPosts !== null) {
-                foreach ($listPosts as $listPost) {
-                    if ($listPost->getLinkPostSelect() !== null){
-                        
-                        $listPost->setLinkSubtitle($listPost->getLinkPostSelect()->getTitle());
-                        $listPost->setLink($listPost->getLinkPostSelect()->getUrl());
-                    }
-                    if (empty($listPost->getTitle())) {
-                        $this->entityManager->remove($listPost);
-                        $this->entityManager->flush();
-                    }
-                }
             }
             
             // DATE
@@ -394,26 +305,6 @@ class PostsController extends AbstractController
         return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/deleted', name: 'app_back_posts_paragraph_deleted', methods: ['GET', 'POST'])]
-    public function deleteParagraph(Request $request, $id, PostsRepository $postsRepository, ParagraphPosts $paragraphPosts, ParagraphPostsRepository $paragraphPostsRepository): Response
-    {
-
-        $paragraph = $paragraphPostsRepository->find($id);
-
-        $post = $postsRepository->find($id);
-        $postId = $paragraph->getPosts()->getId();
-        if ($this->isCsrfTokenValid('delete' . $paragraph->getId(), $request->request->get('_token'))) {
-                $paragraph->setLink(null);
-                $paragraph->setLinkSubtitle(null);
-
-                $this->imageOptimizer->deletedPicture($slug);
-
-                $this->entityManager->flush();
-            
-        }
-        
-        return $this->redirectToRoute('app_back_posts_edit', ['id' => $postId], Response::HTTP_SEE_OTHER);
-    }
 
    
 }
