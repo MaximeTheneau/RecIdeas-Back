@@ -1,0 +1,18 @@
+<p>Nouveau commentaire sur l'article {{ posts }}</p>
+<p>{{ comment }}</p>
+<p>Par {{ user }}</p>
+<p>---</p>
+    <a 
+        href="{{ url('admin_comment_delete', {'id': id}, true) }}"
+        target="_blank"
+        style="background-color: #e03636d8; color: #000000; padding: 10px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold; margin-top: 10px;"
+    >
+        Supprimer le commentaire
+    </a>
+    <p>https:{{ url('admin_comment_delete', {'id': id}, true) }}</p>
+
+<br>
+    <a href="{{ url('admin_comment_validate', {'id': id}, true) }}" target="_blank" style="font-weight: bold; margin-top: 10px; background-color: #2ad62a; color: #000000; padding: 10px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        Valider le commentaire
+    </a>
+    <p>https:{{ url('admin_comment_validate', {'id': id}, true) }}</p>

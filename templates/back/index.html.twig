@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+<div class="has-text-centered">
+    {% if app.user %}
+
+    {% endif %}
+    {% if not app.user %}
+    <a class="button is-primary " href="{{ path('app_login') }}">
+        <strong>Se connecter</strong>
+    </a>
+    {% endif %}
+
+{% if is_granted('ROLE_USER') %}
+ <div>
+    <a href="/posts/new" class="button is-primary">
+        Nouveaux Article
+    </a>
+
+    <a class="button is-black " href="/logout" }}">
+        <strong>Déconnexion</strong>
+    </a>
+</div>
+{% endif %}
+</div>
+
+
+
+{% endblock %}

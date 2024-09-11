@@ -1,0 +1,42 @@
+
+###> symfony/framework-bundle ###
+/.env.local
+/ .env.test
+/.env.local.php
+/.env.*.local
+/config/secrets/*
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.logd
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+symfony.conf
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> Image Uploads ###
+/public/upload/*
+###< Image Uploads ###
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

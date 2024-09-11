@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comments index{% endblock %}
+
+{% block body %}
+    <h1>Comments index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for comment in comments %}
+            {% if not comment.parent %}
+                <tr>
+                    <td>{{ comment.id }}</td>
+                    <td>{{ comment.email }}</td>
+                    <td>
+                        <a href="{{ path('app_back_comments_show', {'id': comment.id}) }}" class="button is-info">Répondre</a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% else %}
+            <tr>
+                <td colspan="3">Aucun commentaire trouvé</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

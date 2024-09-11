@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Posts{% endblock %}
+
+{% block body %}
+    <h1>Posts</h1>
+
+    <table class="table-auto">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ article.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ article.title }}</td>
+            </tr>
+            <tr>
+                <th>Contents</th>
+                <td>{{ article.contents }}</td>
+            </tr>
+            <tr>
+                <th>Contents2</th>
+                <td>{{ article.contents2 }}</td>
+            </tr>
+            <tr>
+                <th>Subtitle</th>
+                <td>{{ article.subtitle }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ article.slug }}</td>
+            </tr>
+            <tr>
+                <th>ImgPost</th>
+                <td>{{ article.imgPost ? article.imgPost|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>ImgPost2</th>
+                <td>{{ article.imgPost2 ? article.imgPost2|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>ImgPost3</th>
+                <td>{{ article.imgPost3 ? article.imgPost3|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>ImgPost4</th>
+                <td>{{ article.imgPost4 ? article.imgPost4|json_encode : '' }}</td>
+            </tr>
+            <tr>
+                <th>ImgThumbnail</th>
+                <td>{{ article.imgThumbnail }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ article.updatedAt ? article.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ImgThumbnailJpg</th>
+                <td>{{ article.imgThumbnailJpg }}</td>
+            </tr>
+            <tr>
+                <th>Subtitle2</th>
+                <td>{{ article.subtitle2 }}</td>
+            </tr>
+            <tr>
+                <th>Contents3</th>
+                <td>{{ article.contents3 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_back_posts_index') }}">back to list</a>
+
+    <a href="{{ path('app_back_posts_edit', {'id': article.id}) }}">edit</a>
+
+    {{ include('back/articles/_delete_form.html.twig') }}
+{% endblock %}

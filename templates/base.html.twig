@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Our custom CSS -->
+
+        <title>Backoffice Theneau Maxime</title>
+        
+        <link rel="icon" href="{{ asset('favicon.png') }}">
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmaps %}
+                {% block importmap_app %}{{ importmap('app') }}{% endblock %}
+            {% endblock %}
+            {% endblock %}
+            {{ encore_entry_script_tags('app') }}
+            
+
+
+    </head>
+    <body>
+
+      {% if is_granted('ROLE_USER') %}
+      {% for message in app.flashes('notification') %}
+      <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <p>{{ message }}</p>
+      </div>
+  {% endfor %}
+      <nav class="contents__nav md:w-1/4 bg-zinc-900 text-white max-h-full h-full md:fixed top-0 flex flex-col  justify-between ">  
+        <ul>
+          <li class="flex text-lg p-2 border-gray-600 border-t navbar__menu">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+            </svg>
+            
+            <span class="flex-1 ml-3 text-left whitespace-nowrap">Categories</span>
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          </li>
+          <li>
+            <ul class=" navbar__menu__list hidden p-2">
+              <li class="flex text-lg pl-4 p-2 ">
+                <a href="/posts/category/Pages">Pages</a>
+              </li>
+              <li class="flex text-lg pl-4 p-2">
+                <a href="/posts/category/Articles">Articles</a>
+              </li>
+              <li class="flex text-lg pl-4 p-2 ">
+                <a href="/posts/category/Interventions">Interventions</a>
+              </li>
+              <li class="flex text-lg pl-4 p-2 ">
+                <a href="/comments">Commentaire</a>
+              </li>
+            </ul>
+          </li>
+          <li class="flex text-lg p-2 border-gray-600 border-t navbar__menu__add">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>              
+            <span class="flex-1 ml-3 text-left whitespace-nowrap">Ajouter</span>
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          </li>
+          <li>
+            <ul class="add__posts hidden p-2">
+                <li class=" flex text-lg pl-4" >
+                    <a href="{{ path('app_back_category_new') }}">Ajouter une categories</a>
+                </li>
+                <li class=" flex text-lg pl-4" >
+                  <a href="{{ path('app_back_subcategory_new') }}">Ajouter une sous-categories</a>
+                </li>                
+                <li class=" flex text-lg pl-4" >
+                  <a href="{{ path('app_back_posts_new') }}">Ajouter un Articles</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        
+        <div class="mt-6 flex flex-col justify-start items-center mb-2 border-gray-600 border-t p-4  ">
+            <div class="flex jusitfy-start items-center   space-x-6 focus:outline-none focus:text-indigo-400   rounded ">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                </svg>
+                <a href="/logout">
+                    <strong>Déconnexion</strong>
+                </a>
+            </div>
+          </div>
+        </nav>
+        {% endif %}
+      <div class="flex justify-end form__contents ">
+        <div class="md:w-3/4 pages__form p-4 ">
+        {% block body %}
+        {% endblock %}
+        </div>
+      </div>
+      <script src={{asset('js/navbar.js')}}></script>
+    </body>
+</html>

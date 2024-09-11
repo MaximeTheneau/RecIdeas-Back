@@ -1,0 +1,7 @@
+<p>
+    Une erreur est survenue lors de l'envoi de votre message. Nous vous prions de bien vouloir nous excuser pour la gêne occasionnée.
+    {% if error is defined %}
+        <br>
+        <strong>Erreur :</strong> {{ error }}
+    {% endif %}
+</p>

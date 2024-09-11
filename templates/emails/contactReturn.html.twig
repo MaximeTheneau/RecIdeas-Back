@@ -1,0 +1,50 @@
+<h1>Une Taupe Chez Vous</h1>
+<p>Bonjour {{ nameContact }},</p>
+<p>Nous vous remercions pour votre message.</p>
+<p>Nous vous contacterons dans les plus brefs délais.</p>
+
+<hr>
+
+<p>Verifier vos données :</p>
+<p>Nom : {{ nameContact }}</p>
+{% if statusContact is defined %}
+    <p>Status : {{ statusContact }}</p>
+{% endif %}
+{% if nameSocietyContact is not empty %}
+    <p>Nom de l'entreprise : {{ nameSocietyContact }}</p>
+{% endif %}
+<p>Email : {{ emailContact }}</p>
+<p>Objet : {{ subjectContact }}</p>
+{% if messageContact is not empty %}
+    <p>Message : {{ messageContact }}</p>
+{% endif %}
+<p>Code Postal : {{ postalCodeContact }}</p>
+{% if adressContact is not empty %}
+    <p>Adresse : {{ adressContact }}</p>
+{% endif %}
+{% if phoneContact is not empty %}
+    <p>Numéro de téléphone : {{ phoneContact }}</p>
+{% endif %}{% if dateContact is not empty  %}
+    <p>Vous souhaitez être contacté le {{ dateContact }} à {{ dateContact }}</p>
+{% endif %}
+{% if interventionContact is not empty %}
+    <p>
+        Intervention : {{ interventionContact }}
+        {% if interventionOtherContact is not empty %}
+            ({{ interventionOtherContact }})
+        {% endif %}
+    </p>
+{% endif %}
+{% if surfaceContact is not empty %}
+    <p>Surface : environs {{ surfaceContact }} m2</p>
+{% endif %}
+{% if imageContact is not empty %}
+    <img src="{{ imageContact }}" alt="Image contact" />
+{% endif %}
+
+
+<hr>
+
+<p>En vous souhaitant une agréable journée,</p>
+<p>L'équipe Une Taupe Chez Vous</p>
+<p><a href="https://unetaupechezvous.fr">unetaupechezvous.fr</a></p>

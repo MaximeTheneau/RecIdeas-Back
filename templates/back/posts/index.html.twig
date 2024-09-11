@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Posts index{% endblock %}
+
+{% block body %}
+
+<div id="modal-build">
+    {% if buildResponse is defined %}
+        {{ buildResponse }}
+    {% endif %}
+</div>
+
+
+        <table class="w-9/12 text-left text-sm font-light m-auto">
+            <thead>
+                <tr class="border-b dark:border-neutral-500">
+                    <th>Titre</th>
+                    <th>Sous-categorie</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for post in posts %}
+            <tr {% if post.draft %}class="text-red-500"{% endif %}>
+                <td>{{ post.title }}</td>
+                    <td>
+                        {% if post.subcategory %}
+                            {{ post.subcategory.name }}
+                        {% endif %}
+                    </td>
+                    <td>
+
+                        <img src={{post.imgPost}} alt="imgHeader" width="100px">
+                    </td>
+                    <td>
+                        <a href="{{ path('app_back_posts_edit', {'id': post.id}) }}" class="button is-info">Modifier</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    <a href="{{ path('app_back_posts_new') }}" class="button is-primary items-center">Nouvelle post</a>
+
+
+    <!-- <script>
+        // Effectuez une requête asynchrone
+        fetch('/votre/url')
+            .then(response => response.text())
+            .then(content => {
+                // Stockez le contenu dans une variable JavaScript
+                var contenu = content;
+                // Mettez à jour le contenu de la div dans votre template Twig
+                document.getElementById('contenu').innerHTML = contenu;
+            })
+            .catch(error => console.error('Erreur lors de la requête:', error));
+    </script> -->
+{% endblock %}

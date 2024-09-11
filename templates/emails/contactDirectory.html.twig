@@ -1,0 +1,13 @@
+
+<h1>Une Taupe Chez Vous Annuaire </h1>
+<h2>De : {{ nameContact }}</p>
+<p>Email : {{emailContact}}</p>
+<p>Objet : {{ subjectContact }}</p>
+<p>Code Postal : {{ postalCodeContact }}</p>
+<p>Location : {{ locationContact }}</p>
+<p>Site Web : {{ websiteContact }}</p>
+<p>Service : {{ serviceContact }}</p>
+<p>Annuaire : {{ directoryContact }}</p>
+{% if directoryOtherContact is not empty %}
+    <p>Autre : {{ directoryOtherContact }}</p>
+{% endif %}

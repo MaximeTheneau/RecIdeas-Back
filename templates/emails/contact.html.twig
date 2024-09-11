@@ -1,0 +1,74 @@
+<head>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3{
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        blockquote {
+            border-left: 2px solid #007bff;
+            padding-left: 10px;
+            margin: 10px 0;
+        }
+        image {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<h1>Objet : {{ subjectContact }} </h1>
+{% if statusContact is not empty %}
+    <p>Status : {{ statusContact }}</p>
+{% endif %}
+<h2>De le part de: {{ nameContact }}</h2>
+{% if phoneContact is not empty %}
+    <p>Numéro de téléphone : {{ phoneContact }}</p>
+{% endif %}
+{% if adressContact is not empty %}
+    <p>Adresse : {{ adressContact }}</p>
+{% endif %}
+<p>Code Postal : {{ postalCodeContact }}</p>
+{% if siretContact is not empty %}
+    <p>SIRET : {{ siretContact }}</p>
+{% endif %}
+{% if nameSocietyContact is not empty %}
+    <p>Nom de l'entreprise : {{ nameSocietyContact }}</p>
+{% endif %}
+<p>Email : {{emailContact}}</p>
+{% if messageContact is not empty %}
+    <p>Message : {{ messageContact }}</p>
+{% endif %}
+{% if interventionContact is not empty %}
+    <p>
+        Intervention : {{ interventionContact }}
+        {% if interventionOtherContact is not empty %}
+            ({{ interventionOtherContact }})
+        {% endif %}
+    </p>
+{% endif %}
+{% if surfaceContact is not empty %}
+    <p>Surface : environs {{ surfaceContact }} m2</p>
+{% endif %}
+
+{% if dateContact is not empty %}
+    <p>
+        Le Client souhaite être contacté le {{ dateContact|date('d.m') }} à {{ dateContact|date('H:i') }}
+    </p>
+{% endif %}
+{% if imageContact is not empty  %}
+    <img src="{{ imageContact }}" alt="Image contact" />
+{% endif %}

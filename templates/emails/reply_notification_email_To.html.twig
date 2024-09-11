@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réponse</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        h1, h2, h3{
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        blockquote {
+            border-left: 2px solid #007bff;
+            padding-left: 10px;
+            margin: 10px 0;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hey, nouvelle réponse</h1>
+        <p>J'ai répondu aux commentaire sur l'article <a href="{{ articleLink }}">{{ articleTitle }}</a>.</p>
+
+        <h2>Réponse :</h2>
+        <blockquote>
+            {{ replyContent }}
+        </blockquote>
+
+        <p>Vous pouvez voir la réponse en cliquant sur le lien ci-dessous :</p>
+        <a href="{{ articleLink }}">Voir la réponse</a>
+
+        <div class="footer">
+            <p>Ce message a été envoyé depuis <a href="https://unetaupechezvous.fr/">Une Taupe Chez Vous</a></p>
+        </div>
+    </div>
+</body>
+</html>
