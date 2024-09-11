@@ -36,6 +36,7 @@ use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
+use App\Service\TranslationService;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -52,6 +53,7 @@ class PostsController extends AbstractController
     private $markdown;
     private $markdownProcessor;
     private $urlGeneratorService;
+    private $translationService;
 
     public function __construct(
         ContainerBagInterface $params,
@@ -60,6 +62,7 @@ class PostsController extends AbstractController
         EntityManagerInterface $entityManager,
         MarkdownProcessor $markdownProcessor,
         UrlGeneratorService $urlGeneratorService,
+        TranslationService $translationService
     )
     {
         $this->params = $params;
@@ -71,6 +74,7 @@ class PostsController extends AbstractController
         $this->markdown = new MarkdownExtra();
         $this->markdownProcessor = $markdownProcessor;
         $this->urlGeneratorService = $urlGeneratorService;
+        $this->translationService = $translationService;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -160,43 +164,15 @@ class PostsController extends AbstractController
 
             $post->setContentsHTML($htmlText);
 
-            // PARAGRAPH
-            $paragraphPosts = $form->get('paragraphPosts')->getData();
-            foreach ($paragraphPosts as $paragraph) {
-                // SLUG
-                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
-                $slugPara = substr($slugPara, 0, 30);
 
-                if (!empty($paragraph->getSubtitle())) {
-                    $paragraph->setSlug($slugPara);
-                } else {
-                    $this->entityManager->remove($paragraph);
-                    $this->entityManager->flush();
-                    }
-
-                 // IMAGE PARAGRAPH
-                 $brochureFileParagraph = $paragraph->getImgPost();
-
-                 if (!empty($brochureFileParagraph)) {
-                     // Cloudinary
-                     $this->imageOptimizer->setPicture($paragraph,  $paragraph, $slugPara); 
-                 } 
- 
-                 // ALT IMG PARAGRAPH
-                 if (empty($paragraph->getAltImg())) {
-                     $paragraph->setAltImg($paragraph->getSubtitle());
-                 } else {
-                     $paragraph->setAltImg($paragraph->getAltImg());
-                 }          
-            } 
 
             $postTranslation = new PostsTranslation();
             $postTranslation->setPost($post);
             $postTranslation->setLocale('en');
-            $postTranslation->setHeading($post->getHeading());
+            $postTranslation->setHeading($this->translationService->translateText($post->getHeading(), 'en'));
             $postTranslation->setTitle($post->getTitle());
             $postTranslation->setMetaDescription($post->getMetaDescription());
-            $postTranslation->setContents($post->getContents());
+            $postTranslation->setContents($this->translationService->translateText($post->getContents(), 'en'));
             $postTranslation->setContentsHTML($post->getContentsHTML());
             $postTranslation->setSlug($post->getSlug());
             $postTranslation->setFormattedDate($post->getSlug());
