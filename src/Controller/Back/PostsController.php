@@ -76,6 +76,8 @@ class PostsController extends AbstractController
         $this->markdownProcessor = $markdownProcessor;
         $this->urlGeneratorService = $urlGeneratorService;
         $this->translationService = $translationService;
+        $this->translations = [ 'es', 'en', 'it', 'de' ];
+
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -105,48 +107,35 @@ class PostsController extends AbstractController
 
         $category = new Category();
 
-        $postTranslation = new PostsTranslation();
-        
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
         
         
         if ($form->isSubmitted() && $form->isValid()) {
-            
-            $postTranslation->setPost($post);
-            $postTranslation->setCategory($post->getCategory());
-            $postTranslation->setSubCategory($post->getSubCategory());
+        
+
+
 
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
-
-            $postTranslation->setTitle($this->translationService->translateText($post->getTitle(), 'en'));
-
-            $slugTranslation = $this->slugger->slug($postTranslation->getTitle());
             
             if($post->getSlug() !== "Accueil") {
                 
+                $slug = $this->slugger->slug($post->getTitle());
                 $post->setSlug($slug);
-
-                $postTranslation->setSlug($this->translationService->translateText($post->getSlug(), 'en'));
 
                 $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
                 $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
             
-                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug);
+                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
 
                 $post->setUrl($url);
-
-                $urlTranslation = $this->urlGeneratorService->generatePath($slugTranslation, null , null);
-
-                $postTranslation->setUrl($url);
 
             } else {
                 $post->setSlug('Accueil');
                 $url = '';
                 $post->setUrl($url);
             }
-
 
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
@@ -172,7 +161,6 @@ class PostsController extends AbstractController
             $createdAt = $formatter->format($post->getCreatedAt());
 
             $post->setFormattedDate('Publié le ' . $createdAt);
-            $postTranslation->setFormattedDate('Published on ' . $createdAt);
             
             // MARKDOWN TO HTML
             $contentsText = $post->getContents();
@@ -180,16 +168,27 @@ class PostsController extends AbstractController
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
             
             $post->setContents($htmlText);
-            $postTranslation->setContents($this->translationService->translateText($post->getContents(), 'en'));
 
 
-
-            $postTranslation->setLocale('en');
-            $postTranslation->setHeading($this->translationService->translateText($post->getHeading(), 'en'));
-            $postTranslation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), 'en'));
-
-            $this->entityManager->persist($postTranslation);
+            foreach ($this->translations as $locale) {
+                $translation = new PostsTranslation();
+                $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
+                $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
+                $translation->setPost($post);
+                $translation->setCategory($post->getCategory());
+                $translation->setSubCategory($post->getSubCategory());
+                $translation->setSlug($this->translationService->translateText($post->getSlug(), $locale));
+                $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
+                $translation->setUrl($urlTranslation);
+                $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
+                $translation->setLocale($locale);
+                $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
+                $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
+    
+                $this->entityManager->persist($translation);
+            }
             $this->entityManager->flush();
+
             
             // $message = new TriggerNextJsBuild('Build');
             // $messageBus->dispatch($message);

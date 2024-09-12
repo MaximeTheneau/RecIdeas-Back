@@ -230,8 +230,10 @@ class PostsController extends ApiController
         $post = $postsRepository->findBy(['slug' => $slug]);
         
         if ($post) {
-            return $this->json(
-                $post[0],
+            return $this->json([
+                'post' => $post[0],
+                'translation' => null,
+            ],
                 Response::HTTP_OK,
                 [],
                 [
@@ -243,8 +245,10 @@ class PostsController extends ApiController
         $postsTranslation = $postsTranslationRepository->findBy(['slug' => $slug]);
 
         if($postsTranslation) {
-            return $this->json(
-                $postsTranslation[0],
+            return $this->json([
+                    'post' => $postsTranslation[0]->getPost() ,
+                    'translation' => $postsTranslation[0],
+                ],
                 Response::HTTP_OK,
                 [],
                 [

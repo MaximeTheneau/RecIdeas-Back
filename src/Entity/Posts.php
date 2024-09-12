@@ -113,11 +113,10 @@ class Posts
     private ?string $srcset = null;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read', 'api_posts_category'])]
     private Collection $translations;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?string $locale = 'fr';
 
 
