@@ -97,10 +97,6 @@ class Posts
     #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
     private ?string $url = null;
 
-    #[ORM\Column(length: 5000)]
-    #[Groups(['api_posts_read', 'api_posts_home'])]
-    private ?string $contentsHTML = null;
-
     #[ORM\Column(nullable: true)]
     private ?bool $draft = null;
 
@@ -117,10 +113,12 @@ class Posts
     private ?string $srcset = null;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
     private Collection $translations;
 
     #[ORM\Column(length: 10, nullable: true)]
-    private ?string $locale = null;
+    #[Groups(['api_posts_category'])]
+    private ?string $locale = 'fr';
 
 
     public function __construct()
@@ -403,18 +401,6 @@ class Posts
         return $this;
     }
 
-    public function getContentsHTML(): ?string
-    {
-        return $this->contentsHTML;
-    }
-
-    public function setContentsHTML(string $contentsHTML): static
-    {
-        $this->contentsHTML = $contentsHTML;
-
-        return $this;
-    }
-
     public function isDraft(): ?bool
     {
         return $this->draft;
@@ -522,7 +508,7 @@ class Posts
 
     public function setLocale(?string $locale): static
     {
-        $this->locale = $locale;
+        $this->locale = 'fr';
 
         return $this;
     }

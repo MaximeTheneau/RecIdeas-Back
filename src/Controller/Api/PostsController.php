@@ -7,6 +7,7 @@ use App\Entity\Category;
 use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
+use App\Repository\PostsTranslationRepository;
 use App\Repository\SubcategoryRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\KeywordRepository;
@@ -27,11 +28,9 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route(
-    path: '/{_locale}/api/posts',
+    path: '/api/posts',
     name: 'api_posts_',
-    requirements: [
-        '_locale' => 'en|fr|de',
-    ],
+
 )]
 class PostsController extends ApiController
 {
@@ -55,7 +54,6 @@ class PostsController extends ApiController
                 'title' => $translation ? $translation->getTitle() : $post->getTitle(),
                 'metaDescription' => $translation ? $translation->getMetaDescription() : $post->getMetaDescription(),
                 'contents' => $translation ? $translation->getContents() : $post->getContents(),
-                'contentsHTML' => $translation ? $translation->getContentsHTML() : $post->getContentsHTML(),
             ];
         }
 
@@ -75,12 +73,15 @@ class PostsController extends ApiController
     }
 
     #[Route('&category={name}', name: 'articles', methods: ['GET'])]
-    public function category(PostsRepository $postsRepository, Category $category): JsonResponse
+    public function category(PostsRepository $postsRepository, Category $category, PostsTranslationRepository $postsTranslationRepository): JsonResponse
     {
         $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'DESC']);
+        $postsTrans = $postsTranslationRepository->findBy(['category' => $category, 'draft' => false]);
+       
+        $data = array_merge($posts, $postsTrans);
 
         return $this->json(
-            $posts,
+            $data,
             Response::HTTP_OK,
             [],
             [
@@ -223,19 +224,14 @@ class PostsController extends ApiController
     }
 
     #[Route('/{slug}', name: 'read', methods: ['GET'])]
-    public function read( Posts $post, CommentsRepository $commentRepository, string $_locale)
-    { 
-        $comments = $commentRepository->findNonReplyComments($post->getId());
-
-        $commentsCollection = new ArrayCollection($comments);
-
-        $post->setComments($commentsCollection);
-
-        $translation = $post->getTranslation($_locale);
-
-        if($_locale === 'fr') {
+    public function read(string $slug,  CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository)
+    {     
+        
+        $post = $postsRepository->findBy(['slug' => $slug]);
+        
+        if ($post) {
             return $this->json(
-                $post,
+                $post[0],
                 Response::HTTP_OK,
                 [],
                 [
@@ -243,39 +239,20 @@ class PostsController extends ApiController
                 ]
             );
         }
+        
+        $postsTranslation = $postsTranslationRepository->findBy(['slug' => $slug]);
 
-        $translationArray = [
-            'id' => $translation->getId(),
-            'heading' => $translation->getHeading(),
-            'title' => $translation->getTitle(),
-            'metaDescription' => $translation->getMetaDescription(),
-            'slug' => $translation->getSlug(),
-            'contents' => $translation->getContents(),
-            'formattedDate' => $translation->getFormattedDate(),
-        ];
-    
-        $additionalData = [
-            'srcset' => $post->getSrcset(),
-            'imgWidth' => $post->getImgWidth(),
-            'imgHeight' => $post->getImgHeight(),
-            'category' => $post->getCategory(),
-            'altImg' => $post->getAltImg(),
-            'url' => $post->getUrl(),
-            'comments' => $post->getComments(),
-            'contentsHTML' => $post->getContentsHTML(),
-        ];
-
-        $responseData = array_merge($translationArray, $additionalData);
-
-    
-        return $this->json(
-            $responseData,
-            Response::HTTP_OK,
-            [],
-            [
-                "groups" => ["api_posts_read"]
-            ]
-        );
+        if($postsTranslation) {
+            return $this->json(
+                $postsTranslation[0],
+                Response::HTTP_OK,
+                [],
+                [
+                    "groups" => ["api_posts_read"]
+                ]
+            );
+        }
+        return $this->json404();
     }
 
     #[Route('&filter=subcategory', name: 'allSubcategory', methods: ['GET'])]

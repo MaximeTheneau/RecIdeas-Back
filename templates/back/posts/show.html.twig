@@ -13,63 +13,63 @@
             </tr>
             <tr>
                 <th>Title</th>
-                <td>{{ article.title }}</td>
+                <td>{{ post.title }}</td>
             </tr>
             <tr>
                 <th>Contents</th>
-                <td>{{ article.contents }}</td>
+                <td>{{ post.contents }}</td>
             </tr>
             <tr>
                 <th>Contents2</th>
-                <td>{{ article.contents2 }}</td>
+                <td>{{ post.contents2 }}</td>
             </tr>
             <tr>
                 <th>Subtitle</th>
-                <td>{{ article.subtitle }}</td>
+                <td>{{ post.subtitle }}</td>
             </tr>
             <tr>
                 <th>Slug</th>
-                <td>{{ article.slug }}</td>
+                <td>{{ post.slug }}</td>
             </tr>
             <tr>
                 <th>ImgPost</th>
-                <td>{{ article.imgPost ? article.imgPost|json_encode : '' }}</td>
+                <td>{{ post.imgPost ? post.imgPost|json_encode : '' }}</td>
             </tr>
             <tr>
                 <th>ImgPost2</th>
-                <td>{{ article.imgPost2 ? article.imgPost2|json_encode : '' }}</td>
+                <td>{{ post.imgPost2 ? post.imgPost2|json_encode : '' }}</td>
             </tr>
             <tr>
                 <th>ImgPost3</th>
-                <td>{{ article.imgPost3 ? article.imgPost3|json_encode : '' }}</td>
+                <td>{{ post.imgPost3 ? post.imgPost3|json_encode : '' }}</td>
             </tr>
             <tr>
                 <th>ImgPost4</th>
-                <td>{{ article.imgPost4 ? article.imgPost4|json_encode : '' }}</td>
+                <td>{{ post.imgPost4 ? post.imgPost4|json_encode : '' }}</td>
             </tr>
             <tr>
                 <th>ImgThumbnail</th>
-                <td>{{ article.imgThumbnail }}</td>
+                <td>{{ post.imgThumbnail }}</td>
             </tr>
             <tr>
                 <th>CreatedAt</th>
-                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
                 <th>UpdatedAt</th>
-                <td>{{ article.updatedAt ? article.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ post.updatedAt ? post.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
                 <th>ImgThumbnailJpg</th>
-                <td>{{ article.imgThumbnailJpg }}</td>
+                <td>{{ post.imgThumbnailJpg }}</td>
             </tr>
             <tr>
                 <th>Subtitle2</th>
-                <td>{{ article.subtitle2 }}</td>
+                <td>{{ post.subtitle2 }}</td>
             </tr>
             <tr>
                 <th>Contents3</th>
-                <td>{{ article.contents3 }}</td>
+                <td>{{ post.contents3 }}</td>
             </tr>
         </tbody>
     </table>

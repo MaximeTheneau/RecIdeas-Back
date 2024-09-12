@@ -30,10 +30,7 @@ class PostTranslationType extends AbstractType
             ->add('contents', TextareaType::class, [
                 'label' => 'Contents',
             ])
-            ->add('contentsHTML', TextareaType::class, [
-                'label' => 'Contents HTML',
-                'required' => false,
-            ]);
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

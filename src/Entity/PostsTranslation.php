@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\PostsRepository;
+use App\Repository\PostsTranslationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 
 
-#[ORM\Entity(repositoryClass: PostsRepository::class)]
+#[ORM\Entity(repositoryClass: PostsTranslationRepository::class)]
 #[ApiRessource(
     normalizationContext: ['groups' => ['api_posts_keyword']],
 )]
@@ -50,14 +50,9 @@ class PostsTranslation
     #[ORM\Column(length: 255)]
     #[Groups(['api_posts_read'])]
     private ?string $formattedDate = null;
-    
-    #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read', 'api_posts_home' ])]
-    private Collection $listPosts;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $links = null;
-
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $textLinks = null;
@@ -86,24 +81,20 @@ class PostsTranslation
     #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
     private ?string $url = null;
 
-    #[ORM\Column(length: 5000)]
-    #[Groups(['api_posts_read', 'api_posts_home'])]
-    private ?string $contentsHTML = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?bool $draft = null;
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $draft = false;
 
     #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'translations', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Posts $post = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
     private ?string $locale = null;
 
 
     public function __construct()
     {
-        $this->listPosts = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->keywords = new ArrayCollection();
     }
@@ -321,18 +312,6 @@ class PostsTranslation
     public function setUrl(?string $url): static
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    public function getContentsHTML(): ?string
-    {
-        return $this->contentsHTML;
-    }
-
-    public function setContentsHTML(string $contentsHTML): static
-    {
-        $this->contentsHTML = $contentsHTML;
 
         return $this;
     }
