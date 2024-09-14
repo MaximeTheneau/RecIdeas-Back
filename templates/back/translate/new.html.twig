@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Translate{% endblock %}
+
+{% block body %}
+    <h1>Create new Translate</h1>
+
+    {{ include('back/translate/_form.html.twig') }}
+
+    <a href="{{ path('app_back_translate_index') }}">back to list</a>
+{% endblock %}
