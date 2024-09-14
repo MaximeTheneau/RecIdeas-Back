@@ -21,6 +21,17 @@ class TranslateTranslationRepository extends ServiceEntityRepository
         parent::__construct($registry, TranslateTranslation::class);
     }
 
+    public function findByTranslate(string $name, string $locale)
+    {
+        return $this->createQueryBuilder('tt')
+        ->innerJoin('tt.translate', 't') // Jointure avec l'entité Translate
+            ->where('t.name = :name') // Condition sur le champ name de Translate
+            ->andWhere('tt.locale = :locale') // Condition sur le champ locale de TranslateTranslation
+            ->setParameter('name', $name)
+            ->setParameter('locale', $locale)
+            ->getQuery()
+            ->getSingleResult();
+    }
     //    /**
     //     * @return TranslateTranslation[] Returns an array of TranslateTranslation objects
     //     */
