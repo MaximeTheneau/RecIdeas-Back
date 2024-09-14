@@ -35,14 +35,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PostsController extends ApiController
 {
     #[Route('/home', name: 'home', methods: ['GET'])]
-    public function home(TranslatorInterface $translator, PostsRepository $postsRepository, CategoryRepository $categoryRepository, $_locale): JsonResponse
+    public function home(TranslatorInterface $translator, PostsRepository $postsRepository, CategoryRepository $categoryRepository): JsonResponse
     {      
 
-           $posts = $postsRepository->findPostsWithTranslations($_locale);
+        $post = $postsRepository->findBy(['slug' => 'Accueil']);
+        $postsTranslation = $post[0]->getTranslations();
 
+        if ($post) {
+            return $this->json([
+                'post' => $post[0],
+                'translation' => $postsTranslation,
+            ],
+                Response::HTTP_OK,
+                [],
+                [
+                    "groups" => ["api_posts_read"]
+                ]
+            );
+        }
         $responsePosts = [];
         foreach ($posts as $post) {
-            // Trouver la traduction appropriée pour la locale donnée
             $translation = $post->getTranslations()->filter(function ($t) use ($_locale) {
                 return $t->getLocale() === $_locale;
             })->first();
