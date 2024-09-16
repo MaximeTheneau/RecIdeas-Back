@@ -116,7 +116,7 @@ class CommentsController extends ApiController
         if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts'])  ) {
             return $this->json(
                 [
-                    "erreur" => "Erreur de saisie",
+                    "erreur" => "Input Error",
                     "code_error" => 400
                 ],
                 Response::HTTP_NOT_FOUND, // 400
@@ -126,14 +126,14 @@ class CommentsController extends ApiController
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             return $this->json(
                 [
-                    "erreur" => "Adresse e-mail invalide",
+                    "erreur" => "Email Error",
                     "code_error" => 400
                 ],
                 Response::HTTP_BAD_REQUEST, // 400
             );
         }
 
-        return new JsonResponse(['message' => 'Votre commentaire a bien été envoyé ! On le valide au plus vite !'], 200);
+        return new JsonResponse(['message' => 'Ok'], 200);
 
 
         }
@@ -219,11 +219,11 @@ class CommentsController extends ApiController
         }
 
         if ($donnees['disposable']) {
-            return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
+            return new JsonResponse(['message' => 'Email jetable detected'], 400);
         } 
 
         if (!$donnees['mx'] ) {
-            return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
+            return new JsonResponse(['message' => 'Email Error'], 400);
         } 
         if (!$existingUser) {
 
@@ -258,7 +258,7 @@ class CommentsController extends ApiController
         }
     
     } catch (\Exception $e) {
-        return new JsonResponse(['message' => 'Veuillez vérifier l\'adresse e-mail fournie.'], 400);
+        return new JsonResponse(['message' => 'Error try later'], 400);
     }
 
     }
