@@ -10,10 +10,6 @@ class UrlGeneratorService
             return sprintf('/%s', $lang);
         }
 
-        if ($lang === 'fr') {
-            $lang = '';
-        }
-
         if ($subcategory !== null && $category !== null) {
             return sprintf('%s/%s/%s/%s', $lang, $category, $subcategory, $slug);
         } elseif ($category === 'Page') {

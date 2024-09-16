@@ -180,13 +180,10 @@ class PostsController extends AbstractController
                 $translation->setSubCategory($post->getSubCategory());
 
                 // SLug 
-                 if($post->getSlug() !== "home") {
-                    $translation->setSlug(
-                        strtolower($this->slugger->slug(
-                        $this->translationService->translateText($post->getSlug(), $locale)
-                    )));
-                }
-                $translation->setSlug('home');
+                $translation->setSlug(
+                    strtolower($this->slugger->slug(
+                    $this->translationService->translateText($post->getSlug(), $locale)
+                )));
                 $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
                 $translation->setUrl($urlTranslation);
                 
