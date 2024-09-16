@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class PostsController extends ApiController
 {
-    #[Route('/home', name: 'home', methods: ['GET'])]
+    #[Route('/homeAll', name: 'home', methods: ['GET'])]
     public function home(TranslatorInterface $translator, PostsRepository $postsRepository, CategoryRepository $categoryRepository): JsonResponse
     {      
 
@@ -235,18 +235,43 @@ class PostsController extends ApiController
         );
     }
 
+    // #[Route('/{slug}', name: 'read', methods: ['GET'])]
+    // public function read(string $slug, Posts $post, CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository)
+    // {     
+        
+    //     // $post = $postsRepository->findBy(['slug' => $slug]);
+        
+    //     $comments = $commentRepository->findNonReplyComments($post->getId());
+
+    //     // $commentsCollection = new ArrayCollection($comments);
+
+    //     // $post->setComments($commentsCollection);
+        
+    //     $postsTranslation = $postsTranslationRepository->findBy(['slug' => $slug]);
+        
+    //     if ($postsTranslation) {
+    //         $post = $postsTranslation;
+    //         return $this->json([
+    //             'post' => $postsTranslation[0],
+    //         ],
+    //             Response::HTTP_OK,
+    //             [],
+    //             [
+    //                 "groups" => ["api_posts_read"]
+    //             ]
+    //         );
+    //     }
+        
+
+
+    //     return $this->json404();
+    // }
+
     #[Route('/{slug}', name: 'read', methods: ['GET'])]
     public function read(string $slug,  CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository)
     {     
         
-        $post = $postsRepository->findAllNonDraftPosts(['slug' => $slug]);
-        
-        $comments = $commentRepository->findNonReplyComments($post->getId());
-
-        $commentsCollection = new ArrayCollection($comments);
-
-        $post->setComments($commentsCollection);
-        
+        $post = $postsRepository->findBy(['slug' => $slug]);
         
         if ($post) {
             return $this->json([

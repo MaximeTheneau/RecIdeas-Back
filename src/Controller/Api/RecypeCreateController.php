@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
-use App\Repository\TranslateTranslationRepository;
+use App\Repository\TranslateRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,19 +42,20 @@ class RecypeCreateController extends ApiController
     }
 	
     #[Route('', name: '', methods: ['POST'])]
-    public function add(TranslateTranslationRepository $translateTranslationRepository, Request $request, MailerInterface $mailer): JsonResponse
+    public function add(TranslateRepository $translateRepository, Request $request, MailerInterface $mailer): JsonResponse
     {
 
     $content = $request->getContent();
     $data = $request->request->all();
     $data = json_decode($content, true);
 
-    
-    try {
-        $translations = $translateTranslationRepository->findByTranslate($data['type'], $data['locale']);
-                                
-        $promptRecype = $translations->getTranslation();
-    
+    // try {
+        $translations = $translateRepository->findByTranslate($data['type'], $data['locale']);
+        
+        $promptRecypes = $translations->getTranslateTranslations();
+        
+        foreach ($promptRecypes as $translation) {
+        }
 
 
         $client = HttpClient::create();
@@ -71,7 +72,7 @@ class RecypeCreateController extends ApiController
                         'content' => [
                             [
                                 'type' => 'text',
-                                'text' => $promptRecype
+                                'text' => $translation->getTranslation() . $data['type']
                             ],
                         ]
                     ]
@@ -92,28 +93,28 @@ class RecypeCreateController extends ApiController
         }
 
 
-    }
-    catch (\Exception $e) {
+    // }
+    // catch (\Exception $e) {
 
-        // $email = (new TemplatedEmail())
-        // ->to($_ENV['MAILER_TO_WEBMASTER'])
-        // ->from($_ENV['MAILER_TO'])
-        // ->subject('Erreur lors de l\'envoie de l\'email')
-        // ->htmlTemplate('emails/error.html.twig')
-        // ->context([
-        //     'error' => $e->getMessage(),
-        // ]);
-        // $mailer->send($email);
+    //     // $email = (new TemplatedEmail())
+    //     // ->to($_ENV['MAILER_TO_WEBMASTER'])
+    //     // ->from($_ENV['MAILER_TO'])
+    //     // ->subject('Erreur lors de l\'envoie de l\'email')
+    //     // ->htmlTemplate('emails/error.html.twig')
+    //     // ->context([
+    //     //     'error' => $e->getMessage(),
+    //     // ]);
+    //     // $mailer->send($email);
 
 
-        return $this->json(
-            [
-                "erreur" => "Erreur lors de l'identification, veuillez réessayer plus tard",
-                "code_error" => Response::HTTP_FORBIDDEN
-            ],
-            Response::HTTP_FORBIDDEN
-        );
-    }
+    //     return $this->json(
+    //         [
+    //             "erreur" => "Erreur lors de l'identification, veuillez réessayer plus tard",
+    //             "code_error" => Response::HTTP_FORBIDDEN
+    //         ],
+    //         Response::HTTP_FORBIDDEN
+    //     );
+    // }
 }
             
 }

@@ -24,6 +24,9 @@ class Translate
     #[ORM\Column(length: 1000)]
     private ?string $translate = null;
 
+    #[ORM\Column(length: 10)]
+    private ?string $locale = "fr";
+
     public function __construct()
     {
         $this->translateTranslations = new ArrayCollection();
@@ -84,6 +87,18 @@ class Translate
     public function setTranslate(string $translate): static
     {
         $this->translate = $translate;
+
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): static
+    {
+        $this->locale = "fr";
 
         return $this;
     }
