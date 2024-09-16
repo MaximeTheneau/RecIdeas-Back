@@ -15,7 +15,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.GITHUB_TOKEN }}
+        key: ${{ secrets.KEY }}
         script: |
           cd /var/www/html/RecIdeas-Back
           git stash
