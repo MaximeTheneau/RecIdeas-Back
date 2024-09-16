@@ -38,7 +38,7 @@ class PostsTranslation
     #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
     private ?string $metaDescription = null;
     
-    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[ORM\Column(length: 70, type: Types::STRING)]
     #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
     
