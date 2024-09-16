@@ -133,8 +133,8 @@ class PostsController extends AbstractController
                 $post->setUrl($url);
 
             } else {
-                $post->setSlug('Accueil');
-                $url = '';
+                $post->setSlug('home');
+                $url = '/';
                 $post->setUrl($url);
             }
 
