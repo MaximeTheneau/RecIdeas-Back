@@ -38,7 +38,7 @@ class PostsController extends ApiController
     public function home(TranslatorInterface $translator, PostsRepository $postsRepository, CategoryRepository $categoryRepository): JsonResponse
     {      
 
-        $post = $postsRepository->findBy(['slug' => 'Accueil']);
+        $post = $postsRepository->findBy(['slug' => 'home']);
         $postsTranslation = $post[0]->getTranslations();
 
         if ($post) {
