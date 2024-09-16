@@ -239,7 +239,14 @@ class PostsController extends ApiController
     public function read(string $slug,  CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository)
     {     
         
-        $post = $postsRepository->findBy(['slug' => $slug]);
+        $post = $postsRepository->findAllNonDraftPosts(['slug' => $slug]);
+        
+        $comments = $commentRepository->findNonReplyComments($post->getId());
+
+        $commentsCollection = new ArrayCollection($comments);
+
+        $post->setComments($commentsCollection);
+        
         
         if ($post) {
             return $this->json([
