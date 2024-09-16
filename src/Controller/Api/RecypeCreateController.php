@@ -49,7 +49,7 @@ class RecypeCreateController extends ApiController
     $data = $request->request->all();
     $data = json_decode($content, true);
 
-    // try {
+    try {
         $translations = $translateRepository->findByTranslate($data['type'], $data['locale']);
         
         $promptRecypes = $translations->getTranslateTranslations();
@@ -93,28 +93,28 @@ class RecypeCreateController extends ApiController
         }
 
 
-    // }
-    // catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
 
-    //     // $email = (new TemplatedEmail())
-    //     // ->to($_ENV['MAILER_TO_WEBMASTER'])
-    //     // ->from($_ENV['MAILER_TO'])
-    //     // ->subject('Erreur lors de l\'envoie de l\'email')
-    //     // ->htmlTemplate('emails/error.html.twig')
-    //     // ->context([
-    //     //     'error' => $e->getMessage(),
-    //     // ]);
-    //     // $mailer->send($email);
+        $email = (new TemplatedEmail())
+        ->to($_ENV['MAILER_TO_WEBMASTER'])
+        ->from($_ENV['MAILER_TO'])
+        ->subject('Erreur lors de l\'envoie de l\'email')
+        ->htmlTemplate('emails/error.html.twig')
+        ->context([
+            'error' => $e->getMessage(),
+        ]);
+        $mailer->send($email);
 
 
-    //     return $this->json(
-    //         [
-    //             "erreur" => "Erreur lors de l'identification, veuillez réessayer plus tard",
-    //             "code_error" => Response::HTTP_FORBIDDEN
-    //         ],
-    //         Response::HTTP_FORBIDDEN
-    //     );
-    // }
+        return $this->json(
+            [
+                "erreur" => "Erreur lors de l'identification, veuillez réessayer plus tard",
+                "code_error" => Response::HTTP_FORBIDDEN
+            ],
+            Response::HTTP_FORBIDDEN
+        );
+    }
 }
             
 }
