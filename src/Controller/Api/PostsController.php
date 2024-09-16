@@ -87,8 +87,8 @@ class PostsController extends ApiController
     #[Route('&category={name}', name: 'articles', methods: ['GET'])]
     public function category(PostsRepository $postsRepository, Category $category, PostsTranslationRepository $postsTranslationRepository): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'DESC']);
-        $postsTrans = $postsTranslationRepository->findBy(['category' => $category, 'draft' => false]);
+        $posts = $postsRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
+        $postsTrans = $postsTranslationRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
        
         $data = array_merge($posts, $postsTrans);
 

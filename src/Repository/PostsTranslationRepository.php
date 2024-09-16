@@ -115,6 +115,17 @@ class PostsTranslationRepository extends ServiceEntityRepository
             ->getResult();
 
     }
+    public function findByCategoryExcludingHomepage($category, array $homepageSlug)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.category = :category')
+            ->andWhere('p.draft = false')
+            ->andWhere('p.slug NOT IN (:excluded_slugs)')
+            ->setParameter('category', $category)
+            ->setParameter('excluded_slugs', $homepageSlug)
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Posts[] Returns an array of Posts objects
 //     */
