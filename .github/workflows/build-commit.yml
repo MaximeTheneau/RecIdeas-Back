@@ -20,4 +20,4 @@ jobs:
           cd /var/www/html/RecIdeas-Back
           git stash
           git pull
-          bin/console c:c
+          bin/console console:c
