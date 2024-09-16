@@ -13,6 +13,7 @@ jobs:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@v1.0.3
       with:
+        host: ${{ secrets.HOST }}
         key: ${{ secrets.GITHUB_TOKEN }}
         script: |
           cd /var/www/html/RecIdeas-Back
