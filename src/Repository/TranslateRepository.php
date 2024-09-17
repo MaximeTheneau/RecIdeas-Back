@@ -27,7 +27,7 @@ class TranslateRepository extends ServiceEntityRepository
         ->setParameter('name', $name)
         ->leftJoin('t.translateTranslations', 'tt')
         ->addSelect('tt')
-        ->andWhere('tt.locale = :locale')  // Utilisation de 'tt' pour la locale
+        ->andWhere('tt.locale = :locale')  
         ->setParameter('locale', $locale)
         ->getQuery()
         ->getSingleResult();

@@ -49,14 +49,17 @@ class RecypeCreateController extends ApiController
     $data = $request->request->all();
     $data = json_decode($content, true);
 
+    
+    if ($data['locale'] === 'fr') {
+            $translationsFr = $translateRepository->findBy(['locale' => 'fr', 'name' => $data['type']])[0]->getTranslate();
+        $tanslationPrompt = $translationsFr;
+    } else {
+    
+        $translationsFind = $translateRepository->findByTranslate($data['type'], $data['locale']);
+        $tanslationPrompt = $translationsFind->getTranslateTranslations()[0]->getTranslation();
+    }
+    
     try {
-        $translations = $translateRepository->findByTranslate($data['type'], $data['locale']);
-        
-        $promptRecypes = $translations->getTranslateTranslations();
-        
-        foreach ($promptRecypes as $translation) {
-        }
-
 
         $client = HttpClient::create();
         $response = $client->request('POST', 'https://api.openai.com/v1/chat/completions', [
@@ -72,12 +75,12 @@ class RecypeCreateController extends ApiController
                         'content' => [
                             [
                                 'type' => 'text',
-                                'text' => $translation->getTranslation() . $data['type']
+                                'text' => $tanslationPrompt . $data['type']
                             ],
                         ]
                     ]
                 ],
-                'max_tokens' => 300
+                'max_tokens' => 500
             ],
         ]);
 
@@ -96,16 +99,15 @@ class RecypeCreateController extends ApiController
     }
     catch (\Exception $e) {
 
-        $email = (new TemplatedEmail())
-        ->to($_ENV['MAILER_TO_WEBMASTER'])
-        ->from($_ENV['MAILER_TO'])
-        ->subject('Erreur lors de l\'envoie de l\'email')
-        ->htmlTemplate('emails/error.html.twig')
-        ->context([
-            'error' => $e->getMessage(),
-        ]);
-        $mailer->send($email);
-
+        // $email = (new TemplatedEmail())
+        // ->to($_ENV['MAILER_TO_WEBMASTER'])
+        // ->from($_ENV['MAILER_TO'])
+        // ->subject('Erreur lors de l\'envoie de l\'email')
+        // ->htmlTemplate('emails/error.html.twig')
+        // ->context([
+        //     'error' => $e->getMessage(),
+        // ]);
+        // $mailer->send($email);
 
         return $this->json(
             [
