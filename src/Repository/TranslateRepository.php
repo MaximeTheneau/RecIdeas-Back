@@ -32,6 +32,7 @@ class TranslateRepository extends ServiceEntityRepository
         ->getQuery()
         ->getSingleResult();
     }
+
     //    /**
     //     * @return Translate[] Returns an array of Translate objects
     //     */

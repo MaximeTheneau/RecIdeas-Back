@@ -6,6 +6,7 @@ use App\Entity\Translate;
 use App\Entity\TranslateTranslation;
 use App\Form\TranslateType;
 use App\Repository\TranslateRepository;
+use App\Repository\TranslateTranslationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -75,14 +76,21 @@ class TranslateController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_back_translate_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Translate $translate, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Translate $translate, EntityManagerInterface $entityManager, TranslateTranslationRepository $translateRepository): Response
     {
         $form = $this->createForm(TranslateType::class, $translate);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
 
+            $translations = $translateRepository->findByLanguage($translate);
+            
+            foreach ($translations as $translation) {
+                $translation->setTranslation($this->translationService->translateText($translate->getTranslate(), $translation->getLocale()));
+                $this->entityManager->persist($translation);
+                $this->entityManager->flush();
+            }
+            
             return $this->redirectToRoute('app_back_translate_index', [], Response::HTTP_SEE_OTHER);
         }
 
