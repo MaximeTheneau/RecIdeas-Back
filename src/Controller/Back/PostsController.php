@@ -9,6 +9,7 @@ use App\Entity\ParagraphPosts;
 use App\Entity\Keyword;
 use App\Entity\PostsTranslation;
 use App\Form\PostsType;
+use App\Form\ParagraphPostsType;
 use App\Message\TriggerNextJsBuild;
 use App\Repository\PostsRepository;
 use App\Repository\PostsTranslationRepository;
@@ -226,7 +227,7 @@ class PostsController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus, PostsTranslationRepository $postsTranslationRepository): Response
+    public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsRepository $paragraphPostsRepository): Response
     {
         $imgPost = $post->getImgPost();
         
@@ -237,6 +238,7 @@ class PostsController extends AbstractController
         $postExist = $postsRepository->find($id);
         if ($form->isSubmitted() && $form->isValid() ) {
             
+            $translations = $postsTranslationRepository->findByPostAndLanguage($post);
             
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
@@ -272,13 +274,90 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
-            $translations = $postsTranslationRepository->findByPostAndLanguage($post);
+        // PARAGRAPH
+        $paragraphPosts = $form->get('paragraphPosts')->getData();
+
+        foreach ($paragraphPosts as $paragraph) {
+
+            // MARKDOWN TO HTML
+            $markdownText = $paragraph->getParagraph();
+
+            $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
+
+            $paragraph->setParagraph($htmlText);
+
+            // LINK
+            $articleLink = $paragraph->getLinkPostSelect();
+            if ($articleLink !== null) {
+                
+                $paragraph->setLinkSubtitle($articleLink->getTitle());
+                $slugLink = $articleLink->getSlug();
+
+                $categoryLink = $articleLink->getCategory()->getSlug();
+                if ($categoryLink === "Page") {
+                    $paragraph->setLink('/'.$slugLink);
+                }                     
+                if ($categoryLink === "Annuaire") {
+                    $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
+                } 
+                if ($categoryLink === "Articles") {
+                    $subcategoryLink = $articleLink->getSubcategory()->getSlug();
+                    $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                }
+            } 
+
+          
+            
+            // $deletedLink = $form['paragraphPosts'];
+
+            // if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
+            //     $paragraph->setLink(null);
+            //     $paragraph->setLinkSubtitle(null);
+            // }
+
+            // SLUG
+            if (!empty($paragraph->getSubtitle())) {
+                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = substr($slugPara, 0, 30); 
+                $paragraph->setSlug($slugPara);
+
+            } else {
+                $this->entityManager->remove($paragraph);
+                $this->entityManager->flush();
+                }
+
+            // IMAGE PARAGRAPH
+            if (!empty($paragraph->getImgPostParaghFile())) {
+                $brochureFileParagraph = $paragraph->getImgPostParaghFile();
+                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = substr($slugPara, 0, 30);
+                $paragraph->setImgPostParagh($slugPara);
+                $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
+                
+                // ALT IMG PARAGRAPH
+                if (empty($paragraph->getAltImg())) {
+                    $paragraph->setAltImg($paragraph->getSubtitle());
+                } 
+            }
+        } 
+
+            // Translations
             foreach ($translations as $translation) {
                 $translation->setContents($this->translationService->translateText($post->getContents(), $translation->getLocale()));
                 $translation->setTitle($this->translationService->translateText($post->getTitle(), $translation->getLocale()));
                 $translation->setPost($post);
                 $translation->setCategory($post->getCategory());
                 $translation->setSubCategory($post->getSubCategory());
+                foreach ($paragraphPosts as $paragraph) {
+                    // if ($translation->getParagraphPosts() !== null) {
+                        $paragraphPost = $translation->getParagraphPosts()[0] ?? new ParagraphPosts(); 
+                        // $paragraphTranslation = $translation->getParagraphPosts()->getParagraph();
+                        $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
+                        $paragraphPost->setParagraph($translatedParagraphContent);
+                        $paragraphPost->setSubtitle($this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale()));
+                        $translation->addParagraphPost($paragraphPost);
+                        $paragraphPost->setSlug(strtolower($this->slugger->slug($paragraphPost->getSubtitle())));
+                }
 
                 // SLug 
                 

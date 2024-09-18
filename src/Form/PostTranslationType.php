@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class PostTranslationType extends AbstractType
 {
@@ -29,6 +30,15 @@ class PostTranslationType extends AbstractType
             ])
             ->add('contents', TextareaType::class, [
                 'label' => 'Contents',
+            ])
+            ->add('paragraphPosts', CollectionType::class, [
+                'entry_type' => ParagraphPostsType::class,
+                'label' => false,
+                'required' => false,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
             ])
             ;
     }

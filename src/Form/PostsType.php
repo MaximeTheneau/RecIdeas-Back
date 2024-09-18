@@ -168,7 +168,16 @@ class PostsType extends AbstractType
                 'by_reference' => false,
                 'prototype' => true,
                 'label' => false,
-            ]);
+            ])
+            ->add('paragraphPosts', CollectionType::class, [
+                'entry_type' => ParagraphPostsType::class,
+                'label' => false,
+                'required' => false,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ])
             ;
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();

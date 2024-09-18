@@ -75,7 +75,7 @@ class RecypeCreateController extends ApiController
                         'content' => [
                             [
                                 'type' => 'text',
-                                'text' => $tanslationPrompt . $data['type']
+                                'text' => $tanslationPrompt . $data['supplement']
                             ],
                         ]
                     ]
@@ -99,15 +99,15 @@ class RecypeCreateController extends ApiController
     }
     catch (\Exception $e) {
 
-        // $email = (new TemplatedEmail())
-        // ->to($_ENV['MAILER_TO_WEBMASTER'])
-        // ->from($_ENV['MAILER_TO'])
-        // ->subject('Erreur lors de l\'envoie de l\'email')
-        // ->htmlTemplate('emails/error.html.twig')
-        // ->context([
-        //     'error' => $e->getMessage(),
-        // ]);
-        // $mailer->send($email);
+        $email = (new TemplatedEmail())
+        ->to($_ENV['MAILER_TO_WEBMASTER'])
+        ->from($_ENV['MAILER_TO'])
+        ->subject('Erreur lors de l\'envoie de l\'email')
+        ->htmlTemplate('emails/error.html.twig')
+        ->context([
+            'error' => $e->getMessage(),
+        ]);
+        $mailer->send($email);
 
         return $this->json(
             [

@@ -92,11 +92,16 @@ class PostsTranslation
     #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
     private ?string $locale = null;
 
+    #[ORM\OneToMany(targetEntity: ParagraphPosts::class, mappedBy: 'postsTranslation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
+    private Collection $paragraphPosts;
+
 
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->keywords = new ArrayCollection();
+        $this->paragraphPosts = new ArrayCollection();
     }
 
 
@@ -396,6 +401,36 @@ class PostsTranslation
     public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ParagraphPosts>
+     */
+    public function getParagraphPosts(): Collection
+    {
+        return $this->paragraphPosts;
+    }
+
+    public function addParagraphPost(ParagraphPosts $paragraphPost): static
+    {
+        if (!$this->paragraphPosts->contains($paragraphPost)) {
+            $this->paragraphPosts->add($paragraphPost);
+            $paragraphPost->setPostsTranslation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParagraphPost(ParagraphPosts $paragraphPost): static
+    {
+        if ($this->paragraphPosts->removeElement($paragraphPost)) {
+            // set the owning side to null (unless already changed)
+            if ($paragraphPost->getPostsTranslation() === $this) {
+                $paragraphPost->setPostsTranslation(null);
+            }
+        }
 
         return $this;
     }

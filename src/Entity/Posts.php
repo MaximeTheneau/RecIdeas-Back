@@ -115,6 +115,10 @@ class Posts
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $translations;
 
+    #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home' ])]
+    private Collection $paragraphPosts;
+
     #[ORM\Column(length: 10, nullable: true)]
     #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?string $locale = 'fr';
@@ -511,5 +515,35 @@ class Posts
 
         return $this;
     }
+    /**
+     * @return Collection<int, ParagraphPosts>
+     */
+    public function getParagraphPosts(): Collection
+    {
+        return $this->paragraphPosts;
+    }
+
+    public function addParagraphPost(ParagraphPosts $paragraphPost): self
+    {
+        if (!$this->paragraphPosts->contains($paragraphPost)) {
+            $this->paragraphPosts->add($paragraphPost);
+            $paragraphPost->setPosts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParagraphPost(ParagraphPosts $paragraphPost): self
+    {
+        if ($this->paragraphPosts->removeElement($paragraphPost)) {
+            // set the owning side to null (unless already changed)
+            if ($paragraphPost->getPosts() === $this) {
+                $paragraphPost->setPosts(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 }
