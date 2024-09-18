@@ -244,7 +244,7 @@ class PostsController extends AbstractController
             $slug = $this->slugger->slug($post->getTitle());
             $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
             $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
-            if($post->getSlug() !== "Accueil") {
+            if($post->getSlug() !== "home") {
                 $post->setSlug($slug);
                 
                 $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
@@ -252,7 +252,7 @@ class PostsController extends AbstractController
                 $post->setUrl($url);
                 
             } else {
-                $post->setSlug('Accueil');
+                $post->setSlug('home');
                 $url = '/';
                 $post->setUrl($url);
             }
@@ -360,13 +360,14 @@ class PostsController extends AbstractController
                 }
 
                 // SLug 
-                
-                $translation->setSlug(
-                    strtolower($this->slugger->slug(
-                    $this->translationService->translateText($translation->getTitle(), $translation->getLocale())
-                )));
-                $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
-                $translation->setUrl($urlTranslation);
+                if($translation->getSlug() !== $translation->getLocale() . "home") {
+                    $translation->setSlug(
+                        strtolower($this->slugger->slug(
+                        $this->translationService->translateText($translation->getTitle(), $translation->getLocale())
+                    )));
+                    $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
+                    $translation->setUrl($urlTranslation);
+                }
                 
 
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $translation->getLocale()) . $createdAt);
