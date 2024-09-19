@@ -82,7 +82,10 @@ class PostsController extends AbstractController
         $this->translations = [ 'es', 'en', 'it', 'de' ];
 
     }
-    
+    private function createSlug(string $inputString): string
+    {
+        return strtolower($this->slugger->slug($inputString)->slice(0, 50)->toString());
+    }
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
     public function index(PostsRepository $postsRepository, Request $request): Response
     {
@@ -120,14 +123,14 @@ class PostsController extends AbstractController
 
 
             // SLUG
-            $slug =  strtolower($this->slugger->slug($post->getTitle()));
+            $slug =  $this->slugger->slug($post->getTitle());
             
             $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
             $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
 
             if($post->getSlug() !== "home") {
                 
-                $slug = $this->slugger->slug($post->getTitle());
+                $slug = $this->createSlug($post->getTitle());
                 $post->setSlug($slug);
 
             
@@ -168,9 +171,7 @@ class PostsController extends AbstractController
             
             // MARKDOWN TO HTML
             $contentsText = $post->getContents();
-            
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
-            
             $post->setContents($htmlText);
 
 
@@ -184,9 +185,9 @@ class PostsController extends AbstractController
 
                 // SLug 
                 $translation->setSlug(
-                    strtolower($this->slugger->slug(
+                    $this->createSlug(
                     $this->translationService->translateText($post->getSlug(), $locale)
-                )));
+                ));
                 $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
                 $translation->setUrl($urlTranslation);
                 
@@ -242,8 +243,13 @@ class PostsController extends AbstractController
             
             $translations = $postsTranslationRepository->findByPostAndLanguage($post);
             
+            // MARKDOWN TO HTML
+            $contentsText = $post->getContents();
+            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+            $post->setContents($htmlText);
+            
             // SLUG
-            $slug = $this->slugger->slug($post->getTitle());
+            $slug = $this->createSlug($post->getTitle());
             $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
             $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
             if($post->getSlug() !== "home") {
@@ -319,7 +325,7 @@ class PostsController extends AbstractController
 
             // SLUG
             if (!empty($paragraph->getSubtitle())) {
-                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = $this->createSlug($paragraph->getSubtitle());
                 $slugPara = substr($slugPara, 0, 30); 
                 $paragraph->setSlug($slugPara);
 
@@ -331,7 +337,7 @@ class PostsController extends AbstractController
             // IMAGE PARAGRAPH
             if (!empty($paragraph->getImgPostParaghFile())) {
                 $brochureFileParagraph = $paragraph->getImgPostParaghFile();
-                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = $this->createSlug($paragraph->getSubtitle());
                 $slugPara = substr($slugPara, 0, 30);
                 $paragraph->setImgPostParagh($slugPara);
                 $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
@@ -352,7 +358,7 @@ class PostsController extends AbstractController
                 $translation->setSubCategory($post->getSubCategory());
 
                 // Paragraphe 
-                
+
                 // $paragraphPostsCollection = $post->getParagraphPosts(); 
                 // foreach ($paragraphPostsCollection as $paragraph) {
                 //     $paragraphTranslation = $paragraphPostsTranslationRepository
@@ -381,9 +387,9 @@ class PostsController extends AbstractController
                 // SLug 
                 if($translation->getSlug() !== $translation->getLocale() . "home") {
                     $translation->setSlug(
-                        strtolower($this->slugger->slug(
+                        $this->slugger->slug(
                         $this->translationService->translateText($translation->getTitle(), $translation->getLocale())
-                    )));
+                    ));
                     $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
                     $translation->setUrl($urlTranslation);
                 }
