@@ -170,7 +170,7 @@ class PostsController extends ApiController
     public function all(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository ): JsonResponse
     {
     
-        $allPosts = array_merge($postsTranslationRepository->findAll(), $postsRepository->findAllPosts());
+        $allPosts = array_merge($postsTranslationRepository->findBy(['draft' => false]), $postsRepository->findAllPosts(['draft' => false]));
         
 
         return $this->json(

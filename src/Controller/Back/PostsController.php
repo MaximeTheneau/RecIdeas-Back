@@ -356,6 +356,7 @@ class PostsController extends AbstractController
                 $translation->setPost($post);
                 $translation->setCategory($post->getCategory());
                 $translation->setSubCategory($post->getSubCategory());
+                $translation->setDraft($post->isDraft());
 
                 // Paragraphe 
 
