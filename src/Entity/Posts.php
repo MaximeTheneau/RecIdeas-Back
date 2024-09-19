@@ -30,7 +30,7 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $heading = null;
     
-    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[ORM\Column(length: 70, type: Types::STRING)]
     #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
 
@@ -38,13 +38,13 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
     private ?string $metaDescription = null;
     
-    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[ORM\Column(length: 70, type: Types::STRING)]
     #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
     #[Type(type: Types::string)]
-    #[Groups(['api_posts_read', 'api_posts_home'])]
+    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_draft'])]
     private ?string $contents = null;
 
     #[ORM\Column]
@@ -112,7 +112,7 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $srcset = null;
 
-    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'])]
     private Collection $translations;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -120,7 +120,7 @@ class Posts
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_draft'])]
     private ?string $locale = 'fr';
 
 

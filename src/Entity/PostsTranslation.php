@@ -30,7 +30,7 @@ class PostsTranslation
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $heading = null;
     
-    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[ORM\Column(length: 70,  type: Types::STRING)]
     #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
 
@@ -44,7 +44,7 @@ class PostsTranslation
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
     #[Type(type: Types::string)]
-    #[Groups(['api_posts_read', 'api_posts_home'])]
+    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_draft'])]
     private ?string $contents = null;
 
     #[ORM\Column(length: 255)]
@@ -89,7 +89,7 @@ class PostsTranslation
     private ?Posts $post = null;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_category', 'api_posts_draft'])]
     private ?string $locale = null;
 
     #[ORM\OneToMany(targetEntity: ParagraphPostsTranslation::class, mappedBy: 'postsTranslation', cascade: ['persist', 'remove'])]

@@ -269,7 +269,7 @@ class PostsController extends ApiController
     // }
 
     #[Route('/{locale}/{slug}', name: 'read', methods: ['GET'])]
-    public function read(string $slug, string $locale, CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository)
+    public function read(string $slug, string $locale, CommentsRepository $commentRepository, PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository)
     {     
         
         $post = $postsRepository->findBy(['slug' => $slug, 'locale' => $locale]);
@@ -319,7 +319,22 @@ class PostsController extends ApiController
             ]
         );
     }
+    #[Route('/draft/{locale}/{slug}', name: 'draft', methods: ['GET'])]
+    public function readDraft(string $slug, string $locale, PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository): JsonResponse
+    {
+    
+        $draft = $postsRepository->findOneBy([  'locale' => $locale, 'slug' => $slug]);
+        $draftTranslation = $postsTranslationRepository->findOneBy([  'locale' => $locale, 'slug' => $slug]);
 
+        return $this->json(
+            $draft ?? $draftTranslation,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => ["api_posts_draft"]
+            ]
+        );
+    }
     #[Route('&filter=keyword&limit=3&id={id}', name: 'keyword', methods: ['GET'])]
     public function postsFilterKeyword(PostsRepository $postsRepository, KeywordRepository $keywordRepository,  int $id): JsonResponse
     {
