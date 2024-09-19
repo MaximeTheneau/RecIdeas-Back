@@ -8,6 +8,7 @@ use App\Entity\ListPosts;
 use App\Entity\ParagraphPosts;
 use App\Entity\Keyword;
 use App\Entity\PostsTranslation;
+use App\Entity\ParagraphPostsTranslation;
 use App\Form\PostsType;
 use App\Form\ParagraphPostsType;
 use App\Message\TriggerNextJsBuild;
@@ -15,6 +16,7 @@ use App\Repository\PostsRepository;
 use App\Repository\PostsTranslationRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ParagraphPostsRepository;
+use App\Repository\ParagraphPostsTranslationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -227,7 +229,7 @@ class PostsController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsRepository $paragraphPostsRepository): Response
+    public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsRepository $paragraphPostsRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository, EntityManagerInterface $em ): Response
     {
         $imgPost = $post->getImgPost();
         
@@ -348,16 +350,33 @@ class PostsController extends AbstractController
                 $translation->setPost($post);
                 $translation->setCategory($post->getCategory());
                 $translation->setSubCategory($post->getSubCategory());
-                foreach ($paragraphPosts as $paragraph) {
-                    // if ($translation->getParagraphPosts() !== null) {
-                        $paragraphPost = $translation->getParagraphPosts()[0] ?? new ParagraphPosts(); 
-                        // $paragraphTranslation = $translation->getParagraphPosts()->getParagraph();
-                        $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
-                        $paragraphPost->setParagraph($translatedParagraphContent);
-                        $paragraphPost->setSubtitle($this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale()));
-                        $translation->addParagraphPost($paragraphPost);
-                        $paragraphPost->setSlug(strtolower($this->slugger->slug($paragraphPost->getSubtitle())));
-                }
+
+                // Paragraphe 
+                
+                // $paragraphPostsCollection = $post->getParagraphPosts(); 
+                // foreach ($paragraphPostsCollection as $paragraph) {
+                //     $paragraphTranslation = $paragraphPostsTranslationRepository
+                //     ->findOneBy(['paragraphPosts' => $paragraph]);
+
+                //     if (!$paragraphTranslation) {
+                //         $paragraphTranslation = new ParagraphPostsTranslation();
+                //     } 
+                
+                //     $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
+                //     $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
+                
+                //     $paragraphTranslation->setParagraph($translatedParagraphContent);
+                //     $paragraphTranslation->setSubtitle($translatedSubtitle);
+                //     $paragraphTranslation->setSlug(strtolower($this->slugger->slug($translatedSubtitle)));
+                    
+                //     $translation->addParagraphPost($paragraphTranslation);
+                //     $paragraphTranslation->setParagraphPosts($paragraph);
+                    
+                
+                //     $this->entityManager->persist($paragraphTranslation);
+
+                // }
+
 
                 // SLug 
                 if($translation->getSlug() !== $translation->getLocale() . "home") {

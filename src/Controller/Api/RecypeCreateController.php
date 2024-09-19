@@ -20,6 +20,8 @@ use Symfony\Component\Mime\NamedAddress;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Service\MarkdownProcessor;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 #[Route('/api/recype')]
 class RecypeCreateController extends ApiController
@@ -42,8 +44,12 @@ class RecypeCreateController extends ApiController
     }
 	
     #[Route('', name: '', methods: ['POST'])]
-    public function add(TranslateRepository $translateRepository, Request $request, MailerInterface $mailer): JsonResponse
+    public function add(TranslateRepository $translateRepository, Request $request, MailerInterface $mailer, RateLimiterFactory $anonymousApiLimiter): JsonResponse
     {
+    $limiter = $anonymousApiLimiter->create($request->getClientIp());
+    if (false === $limiter->consume(1)->isAccepted()) {
+        throw new TooManyRequestsHttpException();
+    }
 
     $content = $request->getContent();
     $data = $request->request->all();

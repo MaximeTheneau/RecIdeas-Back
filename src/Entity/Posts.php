@@ -48,11 +48,11 @@ class Posts
     private ?string $contents = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_category' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all' ])]
     private ?\DateTime $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all' ])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]

@@ -8,6 +8,7 @@ use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use App\Repository\PostsTranslationRepository;
+use App\Repository\ParagraphPostsTranslationRepository;
 use App\Repository\SubcategoryRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\KeywordRepository;
@@ -166,11 +167,11 @@ class PostsController extends ApiController
     }
 
     #[Route('/all', name: 'all', methods: ['GET'])]
-    public function all(PostsRepository $postsRepository ): JsonResponse
+    public function all(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findAllPosts();
-
+        $allPosts = [$postsTranslationRepository->findAll(), $postsRepository->findAllPosts()];
+        
 
         return $this->json(
             $allPosts,
@@ -267,11 +268,11 @@ class PostsController extends ApiController
     //     return $this->json404();
     // }
 
-    #[Route('/{slug}', name: 'read', methods: ['GET'])]
-    public function read(string $slug,  CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository)
+    #[Route('/{locale}/{slug}', name: 'read', methods: ['GET'])]
+    public function read(string $slug, string $locale, CommentsRepository $commentRepository,PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository)
     {     
         
-        $post = $postsRepository->findBy(['slug' => $slug]);
+        $post = $postsRepository->findBy(['slug' => $slug, 'locale' => $locale]);
         
         if ($post) {
             return $this->json([
@@ -286,12 +287,12 @@ class PostsController extends ApiController
             );
         }
         
-        $postsTranslation = $postsTranslationRepository->findBy(['slug' => $slug]);
-
+        $postsTranslation = $postsTranslationRepository->findOneBy(['slug' => $slug, 'locale' => $locale]);
+        
         if($postsTranslation) {
             return $this->json([
-                    'post' => $postsTranslation[0]->getPost() ,
-                    'translation' => $postsTranslation[0],
+                    'post' => $postsTranslation->getPost() ,
+                    'translation' => $postsTranslation,
                 ],
                 Response::HTTP_OK,
                 [],

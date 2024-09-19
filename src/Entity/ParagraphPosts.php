@@ -71,9 +71,14 @@ class ParagraphPosts
     #[Groups(['api_posts_read'])]
     private ?string $srcset = null;
 
-    #[ORM\ManyToOne(inversedBy: 'paragraphPosts')]
-    private ?PostsTranslation $postsTranslation = null;
-    
+    #[ORM\OneToMany(targetEntity: ParagraphPostsTranslation::class, mappedBy: 'paragraphPosts')]
+    private Collection $paragraphPostsTranslations;
+
+    public function __construct()
+    {
+        $this->paragraphPostsTranslations = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -247,15 +252,34 @@ class ParagraphPosts
         return $this;
     }
 
-    public function getPostsTranslation(): ?PostsTranslation
+    /**
+     * @return Collection<int, ParagraphPostsTranslation>
+     */
+    public function getParagraphPostsTranslations(): Collection
     {
-        return $this->postsTranslation;
+        return $this->paragraphPostsTranslations;
     }
 
-    public function setPostsTranslation(?PostsTranslation $postsTranslation): static
+    public function addParagraphPostsTranslation(ParagraphPostsTranslation $paragraphPostsTranslation): static
     {
-        $this->postsTranslation = $postsTranslation;
+        if (!$this->paragraphPostsTranslations->contains($paragraphPostsTranslation)) {
+            $this->paragraphPostsTranslations->add($paragraphPostsTranslation);
+            $paragraphPostsTranslation->setParagraphPosts($this);
+        }
 
         return $this;
     }
+
+    public function removeParagraphPostsTranslation(ParagraphPostsTranslation $paragraphPostsTranslation): static
+    {
+        if ($this->paragraphPostsTranslations->removeElement($paragraphPostsTranslation)) {
+            // set the owning side to null (unless already changed)
+            if ($paragraphPostsTranslation->getParagraphPosts() === $this) {
+                $paragraphPostsTranslation->setParagraphPosts(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
