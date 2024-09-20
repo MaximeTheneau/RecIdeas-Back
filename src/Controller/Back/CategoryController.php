@@ -3,6 +3,7 @@
 namespace App\Controller\Back;
 
 use App\Entity\Category;
+use App\Entity\CategoryTranslation;
 use App\Form\CategoryType;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Service\TranslationService;
+use Doctrine\ORM\EntityManagerInterface;
 
 
 #[Route('/category')]
@@ -17,12 +20,19 @@ class CategoryController extends AbstractController
 {
 
     private $slugger;
+    private $translationService;
+    private $entityManager;
 
     public function __construct(
+        EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
+        TranslationService $translationService
     )
     {
         $this->slugger = $slugger;
+        $this->translationService = $translationService;
+        $this->translations = [ 'es', 'en', 'it', 'de' ];
+        $this->entityManager = $entityManager;
     }
     
 
@@ -44,12 +54,25 @@ class CategoryController extends AbstractController
 
         
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
             // Create slug 
             if(empty($category->getSlug())) {
-                $slug = $this->slugger->slug($category->getName());
+                $slug = strtolower($this->slugger->slug($category->getName()));
                 $category->setSlug($slug);
             }
+            $category->setLocale('fr');
+
+            foreach ($this->translations as $locale) {
+                $categoryTranslation = new CategoryTranslation();
+                $categoryTranslation->setName($this->translationService->translateText($category->getName(), $locale));
+                $categoryTranslation->setSlug($this->translationService->translateText($category->getSlug(), $locale));
+                $categoryTranslation->setLocale($locale);
+                $categoryTranslation->setCategory($category);
+                $this->entityManager->persist($categoryTranslation);
+            }
+            $this->entityManager->flush();
+
+
             $categoryRepository->save($category, true);
 
             return $this->redirectToRoute('app_back_category_index', [], Response::HTTP_SEE_OTHER);

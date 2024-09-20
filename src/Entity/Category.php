@@ -26,13 +26,23 @@ class Category
     #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_subcategory' ])]
     private ?string $slug = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Posts::class)]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Posts::class, cascade: ['persist', 'remove'])]
     private Collection $posts;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $locale = null;
+
+    /**
+     * @var Collection<int, CategoryTranslation>
+     */
+    #[ORM\OneToMany(targetEntity: CategoryTranslation::class, mappedBy: 'category')]
+    private Collection $categoryTranslations;
 
 
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->categoryTranslations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -94,4 +104,47 @@ class Category
         return $this;
     }
 
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(?string $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CategoryTranslation>
+     */
+    public function getCategoryTranslations(): Collection
+    {
+        return $this->categoryTranslations;
+    }
+
+    public function addCategoryTranslation(CategoryTranslation $categoryTranslation): static
+    {
+        if (!$this->categoryTranslations->contains($categoryTranslation)) {
+            $this->categoryTranslations->add($categoryTranslation);
+            $categoryTranslation->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategoryTranslation(CategoryTranslation $categoryTranslation): static
+    {
+        if ($this->categoryTranslations->removeElement($categoryTranslation)) {
+            // set the owning side to null (unless already changed)
+            if ($categoryTranslation->getCategory() === $this) {
+                $categoryTranslation->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+
+   
 }

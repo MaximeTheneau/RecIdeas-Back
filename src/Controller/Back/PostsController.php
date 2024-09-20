@@ -180,10 +180,19 @@ class PostsController extends AbstractController
                 $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
                 $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
                 $translation->setPost($post);
-                $translation->setCategory($post->getCategory());
-                $translation->setSubCategory($post->getSubCategory());
+                $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translation) use ($locale) {
+                    return $translation->getLocale() === $locale;
+                });
+                $categoryTranslation = $categoryTranslations->first();
+
+                $translation->setCategory($categoryTranslation);
+
+                // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
 
                 // SLug 
+                $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+
                 $translation->setSlug(
                     $this->createSlug(
                     $this->translationService->translateText($post->getSlug(), $locale)

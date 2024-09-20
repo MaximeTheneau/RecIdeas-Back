@@ -57,10 +57,6 @@ class PostsTranslation
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $textLinks = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_category','api_posts_keyword' ])]
-    private ?Category $category = null;
-
     #[ORM\Column(length: 125, nullable: true)]
     #[Groups(['api_posts_category', 'api_posts_home', 'api_posts_read',  'api_posts_desc', 'api_posts_keyword', 'api_posts_all', 'api_posts_category', 'api_posts_subcategory'])]
     private ?string $altImg = null;
@@ -95,6 +91,10 @@ class PostsTranslation
     #[ORM\OneToMany(targetEntity: ParagraphPostsTranslation::class, mappedBy: 'postsTranslation', cascade: ['persist', 'remove'])]
     #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home' ])]
     private Collection $paragraphPosts;
+
+    #[ORM\ManyToOne(inversedBy: 'postsTranslations')]
+    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home' ])]
+    private ?CategoryTranslation $category = null;
 
 
     public function __construct()
@@ -173,17 +173,17 @@ class PostsTranslation
         return $this;
     }
 
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
+    // public function getCategory(): ?Category
+    // {
+    //     return $this->category;
+    // }
 
-    public function setCategory(?Category $category): self
-    {
-        $this->category = $category;
+    // public function setCategory(?Category $category): self
+    // {
+    //     $this->category = $category;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getAltImg(): ?string
     {
@@ -431,6 +431,18 @@ class PostsTranslation
                 $paragraphPost->setPostsTranslation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCategory(): ?CategoryTranslation
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?CategoryTranslation $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }
