@@ -359,30 +359,31 @@ class PostsController extends AbstractController
                 $translation->setDraft($post->isDraft());
 
                 // Paragraphe 
+                $paragraphPostsCollection = $post->getParagraphPosts(); 
+                $translationCollection = $translation->getParagraphPosts(); 
 
-                // $paragraphPostsCollection = $post->getParagraphPosts(); 
-                // foreach ($paragraphPostsCollection as $paragraph) {
-                //     $paragraphTranslation = $paragraphPostsTranslationRepository
-                //     ->findOneBy(['paragraphPosts' => $paragraph]);
-
-                //     if (!$paragraphTranslation) {
-                //         $paragraphTranslation = new ParagraphPostsTranslation();
-                //     } 
-                
-                //     $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
-                //     $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
-                
-                //     $paragraphTranslation->setParagraph($translatedParagraphContent);
-                //     $paragraphTranslation->setSubtitle($translatedSubtitle);
-                //     $paragraphTranslation->setSlug(strtolower($this->slugger->slug($translatedSubtitle)));
+                foreach ($paragraphPostsCollection as $paragraph) {
+                   
+                    $paragraphTranslation = $translationCollection->filter(function($existingTranslation) use ($paragraph, $translation) {
+                        return $existingTranslation->getParagraphPosts()->getId() === $paragraph->getId() ;
+                    })->first();
                     
-                //     $translation->addParagraphPost($paragraphTranslation);
-                //     $paragraphTranslation->setParagraphPosts($paragraph);
+                    if (!$paragraphTranslation) {
+                        $paragraphTranslation = new ParagraphPostsTranslation();
+                        $paragraph->addParagraphPostsTranslation($paragraphTranslation);
+                        $translation->addParagraphPost($paragraphTranslation);
+                    } 
                     
-                
-                //     $this->entityManager->persist($paragraphTranslation);
+                    $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
+                    $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
+                    
+                    $paragraphTranslation->setParagraph($translatedParagraphContent);
+                    $paragraphTranslation->setSubtitle($translatedSubtitle);
+                    $paragraphTranslation->setSlug($this->createSlug($translatedSubtitle));
 
-                // }
+                    $this->entityManager->persist($paragraphTranslation);
+
+                }
 
 
                 // SLug 

@@ -71,7 +71,7 @@ class ParagraphPosts
     #[Groups(['api_posts_read'])]
     private ?string $srcset = null;
 
-    #[ORM\OneToMany(targetEntity: ParagraphPostsTranslation::class, mappedBy: 'paragraphPosts')]
+    #[ORM\OneToMany(targetEntity: ParagraphPostsTranslation::class, mappedBy: 'paragraphPosts', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $paragraphPostsTranslations;
 
     public function __construct()
