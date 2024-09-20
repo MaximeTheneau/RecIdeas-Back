@@ -22,7 +22,7 @@ final class TriggerNextJsBuildHandler
     {
 
         try {
-            $url = 'https://api.github.com/repos/MaximeTheneau/Une-Taupe-Chez-Vous_Next.js/dispatches';
+            $url = 'https://api.github.com/repos/MaximeTheneau/' . $_ENV['TARGET_REPO_NAME'] . '/dispatches';
             
             $data = [
                 'event_type' => 'trigger-nextjs-build',

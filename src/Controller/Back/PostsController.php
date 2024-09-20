@@ -409,8 +409,12 @@ class PostsController extends AbstractController
 
             $postsRepository->save($post, true);
 
+            $message = new TriggerNextJsBuild('Build');
+            $messageBus->dispatch($message);
+            
             return $this->redirectToRoute('app_back_posts_index', [
             ], Response::HTTP_SEE_OTHER);
+            
         }
         $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
         return $this->render('back/posts/edit.html.twig', [
