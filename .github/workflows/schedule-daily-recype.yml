@@ -1,0 +1,36 @@
+name: Scheduled Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.*' 
+
+      - name: 'Random Delai'
+        run: |
+          SECONDS=$(( RANDOM % 10800 ))
+          sleep $SECONDS  
+      
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.KEY }}
+            script: |
+                cd /var/www/html/RecIdeas-Back
+                bin/console app:daily-recype
+                cd /var/www/html/RecIdeas-Front
+                pnpm run build

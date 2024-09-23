@@ -82,9 +82,15 @@ class DailyRecypeCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         $post = new Posts();
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
+
+        $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
+        $titles = array_map(fn($recipe) => $recipe->getTitle(), $listRecype);
+        $titlesString = implode(', ', $titles);
+
         $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
-        $prompt ='Génère une recette de plats de saison (date ' . (new \DateTime())->format('Y-m-d') . ')avec un title de 60 caractères maximum, un heading de 60 caractères maximum et une metaDescription de 135 caractères maximum,
-            le content (recette) doit être sous forme de markdown sans titre juste la recette, le altImg doit être court, sans dupliquer les titres suivants : coq au vin, terrine';
+        $prompt ='Génère une recette de plats de saison (date ' . (new \DateTime())->format('Y-m-d') . ')avec un title de 60 caractères maximum, un heading de 60 caractères maximum et une metaDescription de 130 caractères maximum, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous titre avec petite introduction, le altImg doit être court, sans dupliquer les titres suivants : coq au vin' . $titlesString;
+
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
@@ -96,7 +102,6 @@ class DailyRecypeCommand extends Command
         $response = json_decode($jsonContent, true);
         
         
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
         $post->setTitle($response['title']);
         $post->setHeading($response['heading']);
         $post->setMetaDescription($response['metaDescription']);
@@ -127,14 +132,14 @@ class DailyRecypeCommand extends Command
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
         
         $imageJson = $this->openaiApiImageService->prompt(
-            'Génère une image pour la recette: coq au vin'
+            'Génère une image pour la recette : ' . $post->getTitle()
         );
 
-        // $imageContent = file_get_contents($imageJson);
-        // $localImagePath = 'public/upload/img/test.webp'; 
-        // file_put_contents($localImagePath, $imageContent);
+        $imageContent = file_get_contents($imageJson);
+        $localImagePath = 'public/upload/img/dailyRecipe.webp'; 
+        file_put_contents($localImagePath, $imageContent);
         
-        // $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
+        $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
     
         foreach ($this->translations as $locale) {
             $translation = new PostsTranslation();
