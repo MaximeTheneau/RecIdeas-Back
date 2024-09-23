@@ -112,7 +112,6 @@ class PostsController extends ApiController
     {
         $posts = $postsRepository->findByCategoryExcluding('Page');
         $postsTrans = $postsTranslationRepository->findByCategoryExcluding('Page');
-        dd($postsTrans);
         $data = array_merge($posts, $postsTrans);
 
         return $this->json(
