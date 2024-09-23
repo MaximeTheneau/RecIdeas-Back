@@ -4,6 +4,7 @@ namespace App\Controller\Back;
 
 use App\Entity\Posts;
 use App\Entity\Category;
+use App\Entity\CategoryTranslation;
 use App\Entity\ListPosts;
 use App\Entity\ParagraphPosts;
 use App\Entity\Keyword;
@@ -298,36 +299,36 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
-        // PARAGRAPH
-        $paragraphPosts = $form->get('paragraphPosts')->getData();
+            // PARAGRAPH
+            $paragraphPosts = $form->get('paragraphPosts')->getData();
 
-        foreach ($paragraphPosts as $paragraph) {
+            foreach ($paragraphPosts as $paragraph) {
 
-            // MARKDOWN TO HTML
-            $markdownText = $paragraph->getParagraph();
+                // MARKDOWN TO HTML
+                $markdownText = $paragraph->getParagraph();
 
-            $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
+                $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
 
-            $paragraph->setParagraph($htmlText);
+                $paragraph->setParagraph($htmlText);
 
-            // LINK
-            $articleLink = $paragraph->getLinkPostSelect();
-            if ($articleLink !== null) {
-                
-                $paragraph->setLinkSubtitle($articleLink->getTitle());
-                $slugLink = $articleLink->getSlug();
+                // LINK
+                $articleLink = $paragraph->getLinkPostSelect();
+                if ($articleLink !== null) {
+                    
+                    $paragraph->setLinkSubtitle($articleLink->getTitle());
+                    $slugLink = $articleLink->getSlug();
 
-                $categoryLink = $articleLink->getCategory()->getSlug();
-                if ($categoryLink === "Page") {
-                    $paragraph->setLink('/'.$slugLink);
-                }                     
-                if ($categoryLink === "Annuaire") {
-                    $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
-                } 
-                if ($categoryLink === "Articles") {
-                    $subcategoryLink = $articleLink->getSubcategory()->getSlug();
-                    $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
-                }
+                    $categoryLink = $articleLink->getCategory()->getSlug();
+                    if ($categoryLink === "Page") {
+                        $paragraph->setLink('/'.$slugLink);
+                    }                     
+                    if ($categoryLink === "Annuaire") {
+                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
+                    } 
+                    if ($categoryLink === "Articles") {
+                        $subcategoryLink = $articleLink->getSubcategory()->getSlug();
+                        $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                    }
             } 
 
           
@@ -400,11 +401,32 @@ class PostsController extends AbstractController
                 }
 
 
-                // SLug 
+                // Category
+
+                $categoryRepository = $em->getRepository(CategoryTranslation::class);
+
+                $pageCategory = $categoryRepository->findOneBy(['slug' => 'Page']);
+
+                if ($post->getCategory()->getSlug() === 'Page') {
+                    $translation->setCategory($pageCategory);
+                }
+                else {
+                
+                    $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($translation) {
+                        return $translations->getLocale() === $translation->getLocale();
+                    });
+                    $categoryTranslation = $categoryTranslations->first();
+    
+                    $translation->setCategory($categoryTranslation);
+                }
+
+
+                
+                // SLug
+
                 if($translation->getSlug() !== $translation->getLocale() . "home") {
-                    $translateSlug = $this->translationService->translateText($translation->getTitle(), $translation->getLocale());
                     $translation->setSlug(
-                        $this->slugger->slug($translateSlug)
+                        $this->slugger->slug($translation->getTitle())
                     );
                     $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
                     $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;

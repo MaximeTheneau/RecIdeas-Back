@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Posts;
 use App\Entity\Category;
+use App\Entity\CategoryTranslation;
 use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
@@ -86,10 +87,10 @@ class PostsController extends ApiController
     }
 
     #[Route('&category={name}', name: 'articles', methods: ['GET'])]
-    public function category(PostsRepository $postsRepository, Category $category, PostsTranslationRepository $postsTranslationRepository): JsonResponse
+    public function category(PostsRepository $postsRepository, Category $category, CategoryTranslation $categoryTranslation, PostsTranslationRepository $postsTranslationRepository): JsonResponse
     {
         $posts = $postsRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
-        $postsTrans = $postsTranslationRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
+        $postsTrans = $postsTranslationRepository->findByCategoryExcludingHomepage($categoryTranslation, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
        
         $data = array_merge($posts, $postsTrans);
 

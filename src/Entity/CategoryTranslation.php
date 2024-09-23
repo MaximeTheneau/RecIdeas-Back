@@ -21,7 +21,7 @@ class CategoryTranslation
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['api_posts_read', 'api_posts_all', 'api_posts_blog', 'api_posts_blog'])]
+    #[Groups(['api_posts_read', 'api_posts_all', 'api_posts_blog', 'api_posts_blog', 'api_posts_category', ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70)]

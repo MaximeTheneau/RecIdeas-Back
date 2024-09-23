@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PostsTranslation;
-use App\Entity\Category;
+use App\Entity\CategoryTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;

@@ -93,7 +93,7 @@ class PostsTranslation
     private Collection $paragraphPosts;
 
     #[ORM\ManyToOne(inversedBy: 'postsTranslations')]
-    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home', 'api_posts_all', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home', 'api_posts_all', 'api_posts_blog', 'api_posts_category',  ])]
     private ?CategoryTranslation $category = null;
 
 
