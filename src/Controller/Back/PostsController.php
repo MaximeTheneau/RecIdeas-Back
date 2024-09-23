@@ -106,7 +106,7 @@ class PostsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_back_posts_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
+    public function new(Request $request, PostsRepository $postsRepository, MessageBusInterface $messageBus, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -181,13 +181,25 @@ class PostsController extends AbstractController
                 $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
                 $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
                 $translation->setPost($post);
-                $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translation) use ($locale) {
-                    return $translation->getLocale() === $locale;
-                });
-                $categoryTranslation = $categoryTranslations->first();
+                
+                // Category
 
-                $translation->setCategory($categoryTranslation);
+                $categoryRepository = $em->getRepository(CategoryTranslation::class);
 
+                $pageCategory = $categoryRepository->findOneBy(['slug' => 'Page']);
+
+                if ($post->getCategory()->getSlug() === 'Page') {
+                    $translation->setCategory($pageCategory);
+                }
+                else {
+                
+                    $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($locale) {
+                        return $translations->getLocale() === $locale;
+                    });
+                    $categoryTranslation = $categoryTranslations->first();
+    
+                    $translation->setCategory($categoryTranslation);
+                }
                 // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
 
                 // SLug 

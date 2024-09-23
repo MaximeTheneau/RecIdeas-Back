@@ -2,9 +2,13 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class OpenaiApiService
 {
-    public function prompt(string $prompt, $markdown): string
+    public function prompt($prompt, $markdown, $system): string
     {
         try {
 
@@ -18,16 +22,25 @@ class OpenaiApiService
                     'model' => 'gpt-4o-mini',
                     'messages' => [
                         [
+                            'role' => 'system',
+                            'content' => [
+                                [
+                                    'type' => 'text',
+                                    'text' => $system
+                                ],
+                            ]
+                        ],
+                        [
                             'role' => 'user',
                             'content' => [
                                 [
                                     'type' => 'text',
-                                    'text' => $prompt
+                                    'text' => $prompt,
                                 ],
                             ]
                         ]
                     ],
-                    'max_tokens' => 1000
+                    'max_tokens' => 500
                 ],
             ]);
     
@@ -40,29 +53,29 @@ class OpenaiApiService
                 return $content;
             }
 
-            return $data;
+            return $data['choices'][0]['message']['content'];
     
     
         }
         catch (\Exception $e) {
     
-            $email = (new TemplatedEmail())
-            ->to($_ENV['MAILER_TO_WEBMASTER'])
-            ->from($_ENV['MAILER_TO'])
-            ->subject('Erreur lors de l\'envoie de l\'email')
-            ->htmlTemplate('emails/error.html.twig')
-            ->context([
-                'error' => $e->getMessage(),
-            ]);
-            $mailer->send($email);
+            // $email = (new TemplatedEmail())
+            // ->to($_ENV['MAILER_TO_WEBMASTER'])
+            // ->from($_ENV['MAILER_TO'])
+            // ->subject('Erreur lors de l\'envoie de l\'email')
+            // ->htmlTemplate('emails/error.html.twig')
+            // ->context([
+            //     'error' => $e->getMessage(),
+            // ]);
+            // $mailer->send($email);
     
-            return $this->json(
-                [
-                    "erreur" => "Error",
-                    "code_error" => Response::HTTP_FORBIDDEN
-                ],
-                Response::HTTP_FORBIDDEN
-            );
+            // return $this->json(
+            //     [
+            //         "erreur" => "Error",
+            //         "code_error" => Response::HTTP_FORBIDDEN
+            //     ],
+            //     Response::HTTP_FORBIDDEN
+            // );
         }
     }
 }
