@@ -20,7 +20,7 @@ jobs:
 
       - name: 'Random Delai'
         run: |
-          SECONDS=$(( RANDOM % 10800 ))
+          SECONDS=$(( RANDOM % 3600 ))
           sleep $SECONDS  
       
       - name: executing remote ssh commands using password
