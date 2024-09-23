@@ -126,6 +126,14 @@ class PostsTranslationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findByCategoryExcluding($categoryToExclude)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.category != :category')
+            ->setParameter('category', $categoryToExclude)
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Posts[] Returns an array of Posts objects
 //     */

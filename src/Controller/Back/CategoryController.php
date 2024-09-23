@@ -34,7 +34,10 @@ class CategoryController extends AbstractController
         $this->translations = [ 'es', 'en', 'it', 'de' ];
         $this->entityManager = $entityManager;
     }
-    
+    private function createSlug(string $inputString): string
+    {
+        return strtolower($this->slugger->slug($inputString)->slice(0, 50)->toString());
+    }
 
     #[Route('/', name: 'app_back_category_index', methods: ['GET'])]
     public function index(CategoryRepository $categoryRepository): Response
@@ -57,15 +60,14 @@ class CategoryController extends AbstractController
 
             // Create slug 
             if(empty($category->getSlug())) {
-                $slug = strtolower($this->slugger->slug($category->getName()));
-                $category->setSlug($slug);
+                $category->setSlug($this->createSlug($category->getName()));
             }
             $category->setLocale('fr');
 
             foreach ($this->translations as $locale) {
                 $categoryTranslation = new CategoryTranslation();
                 $categoryTranslation->setName($this->translationService->translateText($category->getName(), $locale));
-                $categoryTranslation->setSlug($this->translationService->translateText($category->getSlug(), $locale));
+                $categoryTranslation->setSlug($this->createSlug($categoryTranslation->getName(), $locale));
                 $categoryTranslation->setLocale($locale);
                 $categoryTranslation->setCategory($category);
                 $this->entityManager->persist($categoryTranslation);

@@ -106,7 +106,26 @@ class PostsController extends ApiController
             ]
         );
     }
+    #[Route('/category/blog', name: 'blog', methods: ['GET'])]
+    public function categoryBlog(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository): JsonResponse
+    {
+        $posts = $postsRepository->findByCategoryExcluding('Page');
+        $postsTrans = $postsTranslationRepository->findByCategoryExcluding('Page');
+        $data = array_merge($posts, $postsTrans);
 
+        return $this->json(
+            $data,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_blog"
+
+                ]
+            ]
+        );
+    }
     #[Route('&subcategory={slug}', name: 'subcategory', methods: ['GET'])]
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {

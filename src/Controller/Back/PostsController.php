@@ -190,16 +190,23 @@ class PostsController extends AbstractController
                 // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
 
                 // SLug 
-                $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
-                $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+                if($translation->getSlug() !== $locale . "home") {
 
-                $translation->setSlug(
-                    $this->createSlug(
-                    $this->translationService->translateText($post->getSlug(), $locale)
-                ));
-                $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
-                $translation->setUrl($urlTranslation);
-                
+                    $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                    $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+
+                    $translation->setSlug(
+                        $this->createSlug(
+                        $this->translationService->translateText($post->getSlug(), $locale)
+                    ));
+                    $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
+                    $translation->setUrl($urlTranslation);
+                } else {
+                    $translation->setSlug($locale .'home');
+                    $url = '/' . $locale;
+                    $translation->setUrl($url);
+                }
+    
 
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
                 $translation->setLocale($locale);
@@ -363,8 +370,6 @@ class PostsController extends AbstractController
                 $translation->setContents($this->translationService->translateText($post->getContents(), $translation->getLocale()));
                 $translation->setTitle($this->translationService->translateText($post->getTitle(), $translation->getLocale()));
                 $translation->setPost($post);
-                $translation->setCategory($post->getCategory());
-                $translation->setSubCategory($post->getSubCategory());
                 $translation->setDraft($post->isDraft());
 
                 // Paragraphe 
@@ -397,10 +402,13 @@ class PostsController extends AbstractController
 
                 // SLug 
                 if($translation->getSlug() !== $translation->getLocale() . "home") {
+                    $translateSlug = $this->translationService->translateText($translation->getTitle(), $translation->getLocale());
                     $translation->setSlug(
-                        $this->slugger->slug(
-                        $this->translationService->translateText($translation->getTitle(), $translation->getLocale())
-                    ));
+                        $this->slugger->slug($translateSlug)
+                    );
+                    $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                    $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+
                     $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
                     $translation->setUrl($urlTranslation);
                 }

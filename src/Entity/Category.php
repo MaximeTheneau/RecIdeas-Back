@@ -15,15 +15,15 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_home'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_home', 'api_posts_blog'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_keyword', 'api_posts_blog' ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_subcategory' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_blog' ])]
     private ?string $slug = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Posts::class, cascade: ['persist', 'remove'])]

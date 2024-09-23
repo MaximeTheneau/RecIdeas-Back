@@ -31,7 +31,7 @@ class Posts
     private ?string $heading = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]
-    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_blog', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
 
     #[ORM\Column(length: 1000)]
@@ -39,7 +39,7 @@ class Posts
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]
-    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_blog', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
@@ -70,7 +70,7 @@ class Posts
     private ?string $textLinks = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_category','api_posts_keyword' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_blog', 'api_posts_category','api_posts_keyword' ])]
     private ?Category $category = null;
 
     #[ORM\Column(length: 125, nullable: true)]
@@ -120,7 +120,7 @@ class Posts
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_draft'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_draft', 'api_posts_all', 'api_posts_blog'])]
     private ?string $locale = 'fr';
 
 

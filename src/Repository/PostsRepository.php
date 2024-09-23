@@ -94,6 +94,8 @@ class PostsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    
     public function findPostsWithTranslations(string $locale)
     {
         return $this->createQueryBuilder('p')
@@ -113,6 +115,15 @@ class PostsRepository extends ServiceEntityRepository
             ->setParameter('category', $category)
             ->setParameter('excluded_slugs', $homepageSlug)
             ->orderBy('p.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function findByCategoryExcluding($categoryToExclude)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.category', 'c')
+            ->where('c.name != :categoryName')
+            ->setParameter('categoryName', $categoryToExclude)
             ->getQuery()
             ->getResult();
     }
