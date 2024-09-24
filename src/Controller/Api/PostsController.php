@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Posts;
 use App\Entity\Category;
+use App\Entity\DailyRecype;
 use App\Entity\CategoryTranslation;
 use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route(
     path: '/api/posts',
@@ -36,6 +38,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class PostsController extends ApiController
 {
+    private $entityManager;
+    public function __construct(
+        EntityManagerInterface $entityManager,
+    )
+    {
+        $this->entityManager = $entityManager;
+    }
     #[Route('/homeAll', name: 'home', methods: ['GET'])]
     public function home(TranslatorInterface $translator, PostsRepository $postsRepository, CategoryRepository $categoryRepository): JsonResponse
     {      
@@ -428,7 +437,7 @@ class PostsController extends ApiController
             ]
         );
     }
-    #[Route('/daly-recype', name: 'daily', methods: ['GET'])]
+    #[Route('/daily-recype', name: 'daily', methods: ['GET'])]
     public function daily( ): JsonResponse
     {
         $recype = $this->entityManager->getRepository(DailyRecype::class)->findAll();

@@ -146,24 +146,24 @@ class DailyRecypeCommand extends Command
         file_put_contents($localImagePath, $imageContent);
         
         $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
-            // $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
-            
+
+        unlink($localImagePath);
+
         // Daily Recype
-        $dailyRecype = new DailyRecype;
+        // $dailyRecype = new DailyRecype;
+        $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
         $dailyRecype->setTitle($post->getTitle());
         $dailyRecype->setUrl($post->getUrl());
         $dailyRecype->setLocale('fr');
+        $this->entityManager->persist($dailyRecype);
 
         foreach ($this->translations as $locale) {
 
             $translation = new PostsTranslation();
-            // $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
 
             $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
             $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
             $translation->setPost($post);
-
-
 
             // Category
 
@@ -189,7 +189,9 @@ class DailyRecypeCommand extends Command
             $translation->setUrl($urlTranslation);
           
             // Daily Recype
-            $dailyRecypeTranslation = new DailyRecype;
+            $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
+
+            // $dailyRecypeTranslation = new DailyRecype;
             $dailyRecypeTranslation->setTitle($translation->getTitle());
             $dailyRecypeTranslation->setUrl($translation->getUrl());
             $dailyRecypeTranslation->setLocale($locale);

@@ -40,7 +40,7 @@ class OpenaiApiService
                             ]
                         ]
                     ],
-                    'max_tokens' => 500
+                    'max_tokens' => 1000
                 ],
             ]);
     

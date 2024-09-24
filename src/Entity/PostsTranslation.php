@@ -82,6 +82,7 @@ class PostsTranslation
 
     #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'translations', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['api_posts_blog'])]
     private ?Posts $post = null;
 
     #[ORM\Column(length: 10, nullable: true)]
