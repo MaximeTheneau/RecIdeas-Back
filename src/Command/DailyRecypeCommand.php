@@ -189,7 +189,7 @@ class DailyRecypeCommand extends Command
             $translation->setUrl($urlTranslation);
           
             // Daily Recype
-            $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
+            $dailyRecypeTranslation = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
 
             // $dailyRecypeTranslation = new DailyRecype;
             $dailyRecypeTranslation->setTitle($translation->getTitle());
