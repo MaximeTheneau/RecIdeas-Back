@@ -1,80 +1,29 @@
-# Une Taupe Chez Vous - Back-office 
+# RecIdeas - Back-end
 
-Ce référentiel contient un projet Symfony. Avant de lancer le projet, assurez-vous de remplacer toutes les mentions du fichier .env et .env.local par les valeurs appropriées en fonction de votre environnement et de votre configuration.
+RecIdeas est la partie back-end de notre plateforme dédiée à la création et au partage de recettes faciles et savoureuses. Développée avec des technologies modernes, cette API offre une gestion efficace des données et des fonctionnalités robustes pour le front-end.
 
-## Variables d'environnement
+## Liens GitHub
 
-Dans tous les environnements, l'application Symfony charge les variables d'environnement à partir de différents fichiers. Suivez les instructions ci-dessous pour configurer les variables d'environnement nécessaires.
+- **Front-end :** [Lien GitHub vers le code côté front-end](https://github.com/MaximeTheneau/RecIdeas-Front)
 
-### Fichier .env.local
+## Site Web
 
-Le fichier `.env.local` est utilisé pour les surcharges locales et n'est pas inclus dans le référentiel. Mettez à jour les variables suivantes :
-```
-APP_SECRET=votre_secret_d_application
-DATABASE_URL="mysql://votre_utilisateur_bdd:votre_mot_de_passe_bdd@votre_hote_bdd:votre_port_bdd/votre_nom_bdd?serverVersion=8&charset=utf8mb4"
-CORS_ALLOW_ORIGIN='^https?://(localhost|127.0.0.1)(:[0-9]+)?$'
-APP_PROJECTDIR='http://votre_domaine_projet/public/'
-```
+Vous pouvez accéder à RecIdeas en cliquant sur le lien suivant : [recideas.com](https://recideas.com)
 
-## Configuration Symfony/Mailer
+## Technologies Utilisées
 
-Pour la configuration de Symfony Mailer, mettez à jour les variables suivantes :
+- **Symfony** : Framework PHP pour le développement du backend.
+- **michelf/php-markdown** : Pour le traitement et le rendu de Markdown.
+- **liip/imagine-bundle** : Pour la gestion et l'optimisation des images.
+- **aws/aws-sdk-php** : SDK PHP pour interagir avec les services AWS.
+- **google/cloud-translate** : Pour utiliser l'API de traduction de Google Cloud.
 
-```
-MAILER_TO=destinataire_email@example.com
-MAILER_TO_WEBMASTER=webmaster_email@example.com
-MAILER_DSN=smtp://votre_utilisateur_smtp:votre_mot_de_passe_smtp@smtp.hostinger.com:465
-```
+## Fonctionnalités
 
-## Configuration Symfony/Cloudinary
-
-Pour la configuration de Symfony Cloudinary, mettez à jour les variables suivantes :
-
-```
-CLOUD_NAME=votre_nom_cloud
-CLOUD_API_KEY=votre_cle_api
-CLOUD_API_SECRET=votre_secret_api
-```
-
-N'oubliez pas que ce README est juste un modèle avec des espaces réservés. Remplacez ces espaces réservés par vos valeurs réelles avant de déployer l'application.
-
-## Réalisé par Theneau Maxime
-
-Back office développé avec Symfony. Elle est conçue pour gérer diverses opérations liées à une base de données MySQL.
-
-Gestion des fichiers prise en charge part le service CDN Cloudinary.
-
-Pour plus d'informations sur les bonnes pratiques Symfony et la configuration des variables d'environnement, consultez la documentation officielle de Symfony :
-
-- [Symfony Bonnes Pratiques](https://symfony.com/doc/current/best_practices.html)
-- [Symfony Variables d'Environnement](https://symfony.com/doc/current/configuration/environments.html)
-
-N'hésitez pas à explorer le code source et à fournir des commentaires ou des suggestions d'amélioration. Vos retours seront grandement appréciés !
-
-Bon développement ! 🚀
+- Gestion des recettes : Ajoutez, modifiez et supprimez des recettes facilement.
+- API RESTful : Fournissez des données au front-end via une API bien structurée.
+- Traduction multilingue : Utilisez Google Cloud Translation pour traduire le contenu en plusieurs langues.
+- Optimisation des images : Utilisez LiipImagineBundle pour traiter et optimiser les images.
+- Support Markdown : Permet le rendu de contenu écrit en Markdown.
 
 
-
-{
-	"id": 9,
-    	"createdAt": "2024-09-10T18:21:16+00:00",
-	"updatedAt": null,
-    "fr": {
-	"heading": "Exercitationem aperiam eum quibusdam magni non harum",
-	"title": "Test1",
-	"metaDescription": "Eos molestias ut rem quis voluptas facere corporis cillum alias sint maiores praesentium",
-	"slug": "Test1",
-	"contents": "hgggggggggggggg\n",
-    	"formattedDate": "Publié le 10 septembre 2024",
-
-    }
-    "en":{
-	"heading": "enExercitationem aperiam eum quibusdam magni non harum",
-	"title": "enTest1",
-	"metaDescription": "enEos molestias ut rem quis voluptas facere corporis cillum alias sint maiores praesentium",
-	"slug": "en Teest1",
-	"contents": "enhgggggggggggggg\n",
-	"formattedDate": "en Publié le 10 septembre 2024",
-
-    }
-}
