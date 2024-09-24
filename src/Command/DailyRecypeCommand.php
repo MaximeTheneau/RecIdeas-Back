@@ -95,7 +95,7 @@ class DailyRecypeCommand extends Command
         $titlesString = implode(', ', $titles);
 
         $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
-        $prompt ='Génère une recette de plats de saison (date ' . (new \DateTime())->format('Y-m-d') . ')avec un title de 60 caractères maximum, un heading de 60 caractères maximum et une metaDescription de 130 caractères maximum, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous titre avec petite introduction, le altImg doit être court, sans dupliquer les titres suivants : coq au vin' . $titlesString;
+        $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis, sans dupliquer les titres suivants : coq au vin' . $titlesString;
 
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
@@ -138,7 +138,7 @@ class DailyRecypeCommand extends Command
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
         
         $imageJson = $this->openaiApiImageService->prompt(
-            'Génère une image pour la recette : ' . $post->getTitle()
+            'Créer une Photo aérienne réaliste et appétissante pour la recette : ' . $post->getTitle() . '  avec un léger filtre pour rehausser les couleurs et textures.'
         );
 
         $imageContent = file_get_contents($imageJson);
