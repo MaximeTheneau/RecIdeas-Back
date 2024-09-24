@@ -95,8 +95,8 @@ class DailyRecypeCommand extends Command
         $titlesString = implode(', ', $titles);
 
         $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
-        $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis, sans dupliquer les titres suivants : coq au vin' . $titlesString;
-
+        $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
+        
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
