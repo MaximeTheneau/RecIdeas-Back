@@ -428,6 +428,23 @@ class PostsController extends ApiController
             ]
         );
     }
-   
+    #[Route('/daly-recype', name: 'daily', methods: ['GET'])]
+    public function daily( ): JsonResponse
+    {
+        $recype = $this->entityManager->getRepository(DailyRecype::class)->findAll();
+
+        return $this->json(
+            $recype,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_daily"
+
+                ]
+            ]
+        );
+    }
 
 }

@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Posts;
 use App\Entity\PostsTranslation;
+use App\Entity\DailyRecype;
 use App\Entity\Category;
 use App\Service\OpenaiApiService;
 use App\Service\OpenaiApiImageService;
@@ -85,6 +86,7 @@ class DailyRecypeCommand extends Command
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
 
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
+
         $titles = array_map(fn($recipe) => $recipe->getTitle(), $listRecype);
         $titlesString = implode(', ', $titles);
 
@@ -140,13 +142,25 @@ class DailyRecypeCommand extends Command
         file_put_contents($localImagePath, $imageContent);
         
         $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
-    
+            // $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
+            
+        // Daily Recype
+        $dailyRecype = new DailyRecype;
+        $dailyRecype->setTitle($post->getTitle());
+        $dailyRecype->setSlug($post->getSlug());
+        $dailyRecype->setLocale('fr');
+
         foreach ($this->translations as $locale) {
+
             $translation = new PostsTranslation();
+            // $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
+
             $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
             $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
             $translation->setPost($post);
-            
+
+
+
             // Category
 
             $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($locale) {
@@ -170,14 +184,21 @@ class DailyRecypeCommand extends Command
             $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
             $translation->setUrl($urlTranslation);
           
+            // Daily Recype
+            $dailyRecypeTranslation = new DailyRecype;
+            $dailyRecypeTranslation->setTitle($translation->getTitle());
+            $dailyRecypeTranslation->setSlug($translation->getSlug());
+            $dailyRecypeTranslation->setLocale($locale);
 
-
+            // Date 
             $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
             $translation->setLocale($locale);
             $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
             $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
 
             $this->entityManager->persist($translation);
+            $this->entityManager->persist($dailyRecypeTranslation);
+
         }
 
         $this->entityManager->persist($post);

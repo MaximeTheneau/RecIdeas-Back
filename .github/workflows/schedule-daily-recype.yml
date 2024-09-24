@@ -31,6 +31,6 @@ jobs:
             key: ${{ secrets.KEY }}
             script: |
                 cd /var/www/html/RecIdeas-Back
-                bin/console app:daily-recype
+                php bin/console app:daily-recype
                 cd /var/www/html/RecIdeas-Front
                 pnpm run build
