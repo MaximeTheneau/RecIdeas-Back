@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use \IntlDateFormatter;
 use DateTime;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 #[AsCommand(
     name: 'app:daily-recype',
@@ -38,6 +39,7 @@ class DailyRecypeCommand extends Command
     private $markdownProcessor;
     private $urlGeneratorService;
     private $translationService;
+    private $params;
 
     public function __construct(
         OpenaiApiService $openaiApiService,
@@ -47,7 +49,8 @@ class DailyRecypeCommand extends Command
         SluggerInterface $slugger,
         MarkdownProcessor $markdownProcessor,
         UrlGeneratorService $urlGeneratorService,
-        TranslationService $translationService
+        TranslationService $translationService,
+        ContainerBagInterface $params,
 
         )
     {
@@ -60,6 +63,7 @@ class DailyRecypeCommand extends Command
         $this->urlGeneratorService = $urlGeneratorService;
         $this->translationService = $translationService;
         $this->translations = [ 'es', 'en', 'it', 'de' ];
+        $this->params = $params;
 
         parent::__construct();
     }
@@ -138,7 +142,7 @@ class DailyRecypeCommand extends Command
         );
 
         $imageContent = file_get_contents($imageJson);
-        $localImagePath = 'public/upload/img/dailyRecipe.webp'; 
+        $localImagePath = $this->params->get('app.imgDir') . 'dailyRecipe.webp'; 
         file_put_contents($localImagePath, $imageContent);
         
         $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
