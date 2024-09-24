@@ -151,7 +151,7 @@ class DailyRecypeCommand extends Command
         // Daily Recype
         $dailyRecype = new DailyRecype;
         $dailyRecype->setTitle($post->getTitle());
-        $dailyRecype->setSlug($post->getSlug());
+        // $dailyRecype->setSlug($post->getSlug());
         $dailyRecype->setLocale('fr');
 
         foreach ($this->translations as $locale) {
@@ -191,7 +191,7 @@ class DailyRecypeCommand extends Command
             // Daily Recype
             $dailyRecypeTranslation = new DailyRecype;
             $dailyRecypeTranslation->setTitle($translation->getTitle());
-            $dailyRecypeTranslation->setSlug($translation->getSlug());
+            // $dailyRecypeTranslation->setSlug($translation->getSlug());
             $dailyRecypeTranslation->setLocale($locale);
 
             // Date 
