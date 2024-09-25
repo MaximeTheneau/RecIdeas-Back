@@ -18,10 +18,10 @@ jobs:
         with:
           node-version: '20.*' 
 
-      - name: 'Random Delai'
-        run: |
-          SECONDS=$(( RANDOM % 3600 ))
-          sleep $SECONDS  
+      # - name: 'Random Delai'
+      #   run: |
+      #     SECONDS=$(( RANDOM % 3600 ))
+      #     sleep $SECONDS  
       
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3

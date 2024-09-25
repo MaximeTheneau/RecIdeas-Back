@@ -84,9 +84,9 @@ class DailyRecypeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
-
-        $post = new Posts();
+        $io->title('Daily Recipe Generation Process');
+        // Step 1: Fetch existing recipes
+      
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
 
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
@@ -97,6 +97,8 @@ class DailyRecypeCommand extends Command
         $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
         $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le content (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
         
+        // Step 3: Fetching response from OpenAI
+        $io->section('Step 3: Fetching response from OpenAI');
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
@@ -107,30 +109,32 @@ class DailyRecypeCommand extends Command
         
         $response = json_decode($jsonContent, true);
         
-        
+        $io->text('Recipe generated: ' . $response['title']);
+
+        // Step 4: Creating Post entity
+        $io->section('Step 4: Creating the post');
+        $post = new Posts();
         $post->setTitle($response['title']);
         $post->setHeading($response['heading']);
         $post->setMetaDescription($response['metaDescription']);
         $post->setCategory($category);
         $post->setAltImg($response['altImg']);
         $post->setLocale('fr');
-        
         $post->setDraft(0);
         
-        
+        // Slug generation
         $slug =  $this->slugger->slug($post->getTitle());
         $post->setSlug($slug);
-
         $url = $this->urlGeneratorService->generatePath($slug, $post->getCategory()->getSlug(), null, 'fr');
         $post->setUrl($url);
         
         // DATE
         $post->setCreatedAt(new DateTime());
         $createdAt = $formatter->format($post->getCreatedAt());
-
         $post->setFormattedDate('Publié le ' . $createdAt);
 
-        // MARKDOWN TO HTML
+        // Step 5: Converting Markdown to HTML
+        $io->section('Step 5: Converting markdown to HTML');
         $contentsText = $response['content'];
         $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
         $post->setContents($htmlText);
@@ -141,6 +145,7 @@ class DailyRecypeCommand extends Command
             'Créer une Photo aérienne réaliste et appétissante pour la recette : ' . $post->getTitle() . '  avec un léger filtre pour rehausser les couleurs et textures.'
         );
 
+        // Step 6: Fetching and optimizing the image
         $imageContent = file_get_contents($imageJson);
         $localImagePath = $this->params->get('app.imgDir') . 'dailyRecipe.webp'; 
         file_put_contents($localImagePath, $imageContent);
@@ -149,7 +154,9 @@ class DailyRecypeCommand extends Command
 
         unlink($localImagePath);
 
-        // Daily Recype
+
+        // Step 7: Updating the DailyRecype
+        $io->section('Step 7: Updating the DailyRecype entity');
         // $dailyRecype = new DailyRecype;
         $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
         $dailyRecype->setTitle($post->getTitle());
@@ -157,16 +164,16 @@ class DailyRecypeCommand extends Command
         $dailyRecype->setLocale('fr');
         $this->entityManager->persist($dailyRecype);
 
+        // Step 8: Translating content
+        $io->section('Step 8: Translating content');
+        $io->progressStart(count($this->translations));
         foreach ($this->translations as $locale) {
-
             $translation = new PostsTranslation();
-
             $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
             $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
             $translation->setPost($post);
-
+            
             // Category
-
             $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($locale) {
                 return $translations->getLocale() === $locale;
             });
@@ -177,7 +184,6 @@ class DailyRecypeCommand extends Command
             // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
 
             // SLug 
-
             $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
             $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
 
@@ -190,7 +196,6 @@ class DailyRecypeCommand extends Command
           
             // Daily Recype
             $dailyRecypeTranslation = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
-
             // $dailyRecypeTranslation = new DailyRecype;
             $dailyRecypeTranslation->setTitle($translation->getTitle());
             $dailyRecypeTranslation->setUrl($translation->getUrl());
@@ -204,12 +209,19 @@ class DailyRecypeCommand extends Command
 
             $this->entityManager->persist($translation);
             $this->entityManager->persist($dailyRecypeTranslation);
-
+            
+            $io->progressAdvance();
         }
-
+    
+        $io->progressFinish();
+        
+        // Step 9: Saving the new post
+        $io->section('Step 9: Saving the new post');
         $this->entityManager->persist($post);
 
         $this->entityManager->flush();
+
+        $io->success('Daily recipe has been successfully generated and saved!');
 
         return Command::SUCCESS;
     }
