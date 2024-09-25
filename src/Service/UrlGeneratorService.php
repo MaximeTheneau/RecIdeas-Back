@@ -10,7 +10,7 @@ class UrlGeneratorService
             return sprintf('/%s', $slug);
         }
         if ($category === 'Page') {
-            return sprintf('/%s/%s', $lang, $slug);
+            return sprintf('%s/%s', $lang, $slug);
         }
         if ($category !== null) {
             return sprintf('%s/%s/%s/%s',$lang, 'blog', $category, $slug);
