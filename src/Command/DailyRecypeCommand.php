@@ -90,7 +90,8 @@ class DailyRecypeCommand extends Command
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
 
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
-
+        
+        $io->section('Step 1: Last recype');
         $titles = array_map(fn($recipe) => $recipe->getTitle(), $listRecype);
         $titlesString = implode(', ', $titles);
 
@@ -98,21 +99,20 @@ class DailyRecypeCommand extends Command
         $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le contents (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
         
         // Step 3: Fetching response from OpenAI
-        $io->section('Step 3: Fetching response from OpenAI');
+        $io->section('Step 2: Fetching response from OpenAI');
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
             'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}'
         );
-        // preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
-        // $jsonContent = $matches[1]; 
-        
-        $response = json_decode($responseJson, true);
+        preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
+        $jsonContent = $matches[1]; 
+        $response = json_decode($jsonContent, true);
         
         $io->text('Recipe generated: ' . $response['title']);
 
         // Step 4: Creating Post entity
-        $io->section('Step 4: Creating the post');
+        $io->section('Step 3: Creating the post');
         $post = new Posts();
         $post->setTitle($response['title']);
         $post->setHeading($response['heading']);
@@ -134,7 +134,7 @@ class DailyRecypeCommand extends Command
         $post->setFormattedDate('Publié le ' . $createdAt);
 
         // Step 5: Converting Markdown to HTML
-        $io->section('Step 5: Converting markdown to HTML');
+        $io->section('Step 4: Converting markdown to HTML');
         $contentsText = $response['contents'];
         $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
         $post->setContents($htmlText);
@@ -156,7 +156,7 @@ class DailyRecypeCommand extends Command
 
 
         // Step 7: Updating the DailyRecype
-        $io->section('Step 7: Updating the DailyRecype entity');
+        $io->section('Step 5: Updating the DailyRecype entity');
         // $dailyRecype = new DailyRecype;
         $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
         $dailyRecype->setTitle($post->getTitle());
@@ -165,7 +165,7 @@ class DailyRecypeCommand extends Command
         $this->entityManager->persist($dailyRecype);
 
         // Step 8: Translating content
-        $io->section('Step 8: Translating content');
+        $io->section('Step 6: Translating content');
         $io->progressStart(count($this->translations));
         foreach ($this->translations as $locale) {
             $translation = new PostsTranslation();
@@ -216,7 +216,7 @@ class DailyRecypeCommand extends Command
         $io->progressFinish();
         
         // Step 9: Saving the new post
-        $io->section('Step 9: Saving the new post');
+        $io->section('Step 7: Saving the new post');
         $this->entityManager->persist($post);
 
         $this->entityManager->flush();
