@@ -102,8 +102,8 @@ class DailyRecypeCommand extends Command
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
-            'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}');
-            
+            'Tu es un assistant de cuisine qui aide à générer des recettes aux format Json seulement'
+        );
         preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
         $jsonContent = $matches[1]; 
         
@@ -135,7 +135,7 @@ class DailyRecypeCommand extends Command
 
         // Step 5: Converting Markdown to HTML
         $io->section('Step 5: Converting markdown to HTML');
-        $contentsText = $response['content'];
+        $contentsText = $response['contents'];
         $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
         $post->setContents($htmlText);
 
