@@ -95,8 +95,8 @@ class PostsController extends ApiController
         );
     }
 
-    #[Route('&category={name}', name: 'articles', methods: ['GET'])]
-    public function category(PostsRepository $postsRepository, Category $category, CategoryTranslation $categoryTranslation, PostsTranslationRepository $postsTranslationRepository): JsonResponse
+    #[Route('&category={name}', name: 'na', methods: ['GET'])]
+    public function category(string $name, PostsRepository $postsRepository, Category $category, CategoryTranslation $categoryTranslation, PostsTranslationRepository $postsTranslationRepository): JsonResponse
     {
         $posts = $postsRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
         $postsTrans = $postsTranslationRepository->findByCategoryExcludingHomepage($categoryTranslation, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
