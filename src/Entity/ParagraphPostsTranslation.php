@@ -14,19 +14,19 @@ class ParagraphPostsTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read_translation', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 170)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read_translation', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 5000)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read_translation', 'api_posts_sitemap', 'api_posts_home', 'api_posts_blog' ])]
     private ?string $paragraph = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home' ])]
+    #[Groups(['api_posts_read_translation', 'api_posts_sitemap', 'api_posts_home' ])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'paragraphPosts', targetEntity: PostsTranslation::class)]

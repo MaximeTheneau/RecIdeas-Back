@@ -301,36 +301,36 @@ class PostsController extends ApiController
     public function read(string $slug, string $locale, CommentsRepository $commentRepository, PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository)
     {     
         
-        $post = $postsRepository->findBy(['slug' => $slug, 'locale' => $locale]);
+        $post = $postsRepository->findOneBy(['slug' => $slug, 'locale' => $locale]);
+        $postsTranslation = $postsTranslationRepository->findBy(['post' => $post]);
         
         if ($post) {
+            // Si le post est trouvé, retourner les informations du post
+            $postsTranslation = $postsTranslationRepository->findBy(['post' => $post]);
+    
             return $this->json([
-                'post' => $post[0],
-                'translation' => null,
+                'post' => $post,
             ],
-                Response::HTTP_OK,
-                [],
-                [
-                    "groups" => ["api_posts_read"]
-                ]
-            );
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => ["api_posts_read"]
+            ]);
         }
-        
+
         $postsTranslation = $postsTranslationRepository->findOneBy(['slug' => $slug, 'locale' => $locale]);
-        
-        if($postsTranslation) {
+
+        if ($postsTranslation) {
             return $this->json([
-                    'post' => $postsTranslation->getPost() ,
-                    'translation' => $postsTranslation,
-                ],
-                Response::HTTP_OK,
-                [],
-                [
-                    "groups" => ["api_posts_read"]
-                ]
-            );
+                'post' => $postsTranslation->getPost(),
+            ],
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => ["api_posts_read_translation"]
+            ]);
         }
-        return $this->json404();
+
     }
 
     #[Route('&filter=subcategory', name: 'allSubcategory', methods: ['GET'])]
