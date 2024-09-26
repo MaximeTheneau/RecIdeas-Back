@@ -103,7 +103,7 @@ class DailyRecypeCommand extends Command
         $responseJson = $this->openaiApiService->prompt(
             $prompt,
             false,
-            'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}'
+            'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : json {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}'
         );
         preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
         $jsonContent = $matches[1]; 
