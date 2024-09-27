@@ -17,14 +17,14 @@ class SocialMediaService
     public function __construct(HttpClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
-        $this->cache = new FilesystemAdapter(); // Utilisation du cache pour stocker le token
+        $this->cache = new FilesystemAdapter(); 
 
         $this->appId = $_ENV['FACEBOOK_APP_ID'];
         $this->appSecret = $_ENV['FACEBOOK_APP_SECRET'];
         $this->shortLivedToken = $_ENV['FACEBOOK_SHORT_LIVED_TOKEN'];
     }
 
-    public function postToFacebookPage()
+    public function postToFacebookPage(string $imageUrl, string $caption)
     {
         $pageAccessToken = $this->getPageAccessToken();
 
@@ -32,8 +32,8 @@ class SocialMediaService
 
         $response = $this->httpClient->request('POST', $url, [
             'query' => [
-                'url' => 'https://picture.recideas.com/bienvenue-sur-recideas-15-recettes-faciles-et-savo-5.webp?width=1200',
-                'message' => '$message',
+                'url' => $imageUrl,
+                'message' => $caption,
                 'access_token' => $pageAccessToken,
             ],
         ]);

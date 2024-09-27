@@ -13,6 +13,7 @@ use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
 use App\Service\TranslationService;
 use App\Service\SocialMediaService;
+use App\Message\TriggerNextJsBuild;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -54,7 +55,6 @@ class DailyRecypeCommand extends Command
         TranslationService $translationService,
         ContainerBagInterface $params,
         SocialMediaService $socialMediaService,
-
         )
     {
         $this->openaiApiService = $openaiApiService;
@@ -85,19 +85,17 @@ class DailyRecypeCommand extends Command
         return strtolower($this->slugger->slug($inputString)->slice(0, 50)->toString());
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output ): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Daily Recipe Generation Process');
         // Step 1: Fetch existing recipes
-      
         // $result = $this->socialMediaService->postToFacebookPage();
         // $resultInsta = $this->socialMediaService->postToInstagram('https://picture.recideas.com/bienvenue-sur-recideas-15-recettes-faciles-et-savo-5.webp', 'test');
 
-        // dd($resultInsta);
-
-
         dd('test');
+
+
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
 
         $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
