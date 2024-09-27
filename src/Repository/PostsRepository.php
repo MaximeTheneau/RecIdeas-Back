@@ -124,6 +124,7 @@ class PostsRepository extends ServiceEntityRepository
             ->join('p.category', 'c')
             ->where('c.name != :categoryName')
             ->setParameter('categoryName', $categoryToExclude)
+            ->orderBy('p.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
