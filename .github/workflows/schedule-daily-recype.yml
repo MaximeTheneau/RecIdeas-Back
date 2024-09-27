@@ -3,7 +3,7 @@ name: Scheduled Tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"
+    - cron: "0 6 * * *"
 
 jobs:
   test:
@@ -18,10 +18,10 @@ jobs:
         with:
           node-version: '20.*' 
 
-      # - name: 'Random Delai'
-      #   run: |
-      #     SECONDS=$(( RANDOM % 3600 ))
-      #     sleep $SECONDS  
+      - name: 'Random Delai'
+        run: |
+          SECONDS=$(( RANDOM % 3600 ))
+          sleep $SECONDS  
       
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3
@@ -31,6 +31,8 @@ jobs:
             key: ${{ secrets.KEY }}
             script: |
                 cd /var/www/html/RecIdeas-Back
-                php bin/console app:daily-recype
+                bin/console app:daily-recype
                 cd /var/www/html/RecIdeas-Front
                 pnpm run build
+                cd /var/www/html/RecIdeas-Back
+                bin/console app:social-media-post
