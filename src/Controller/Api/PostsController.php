@@ -199,17 +199,16 @@ class PostsController extends ApiController
     public function all(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository ): JsonResponse
     {
     
-        $allPosts = array_merge($postsTranslationRepository->findBy(['draft' => false]), $postsRepository->findAllPosts(['draft' => false]));
+        // $postsTranslation = $postsTranslationRepository->findBy(['draft' => false]);
         
-
         return $this->json(
-            $allPosts,
+            $postsRepository->findAllPosts(['draft' => false]),
             Response::HTTP_OK,
             [],
             [
                 "groups" => 
                 [
-                    "api_posts_all"
+                    "api_posts_all",
                 ]
             ]
         );
