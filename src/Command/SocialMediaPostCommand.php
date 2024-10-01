@@ -75,7 +75,7 @@ class SocialMediaPostCommand extends Command
 
         // Google Search
         try {
-            $this->indexingService->publishUrl($_ENV['DOMAIN'] . '/sitemap.xml');
+            $this->indexingService->publishUrl($_ENV['NGINX_DOMAIN'] . '/sitemap.xml');
             $output->writeln('SiteMap envoyé avec succès.');
         } catch (\Exception $e) {
             $output->writeln('Erreur Sitemap ');
