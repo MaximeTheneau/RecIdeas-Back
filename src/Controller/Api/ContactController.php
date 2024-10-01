@@ -63,15 +63,15 @@ class ContactController extends ApiController
         }
     }
 
-    if (strlen($data['postalCode']) !== 5) {
-        return $this->json(
-            [
-                "erreur" => "Erreur lors de la saisie du code postal (5 chiffres attendus)",
-                "code_error" => Response::HTTP_FORBIDDEN
-            ],
-            Response::HTTP_FORBIDDEN
-        );
-    }
+    // if (strlen($data['postalCode']) !== 5) {
+    //     return $this->json(
+    //         [
+    //             "erreur" => "Erreur lors de la saisie du code postal (5 chiffres attendus)",
+    //             "code_error" => Response::HTTP_FORBIDDEN
+    //         ],
+    //         Response::HTTP_FORBIDDEN
+    //     );
+    // }
 
     // if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
     //     return $this->json(
@@ -84,41 +84,35 @@ class ContactController extends ApiController
     // }
     try {
 
-        if (isset($data['emailReturn']) && $data['emailReturn'] === 'true') {
-            $emailReturn = (new TemplatedEmail())
-            ->to($data['email'])
-            ->from($_ENV['MAILER_TO'])
-            ->subject('Votre message a bien été envoyé')
-            ->htmlTemplate('emails/contactReturn.html.twig')
-            ->context([
-                'subjectContact' => $data['subject'],
-                'nameContact' => $data['name'],
-                'emailContact' => $data['email'],
-                'phoneContact' => $data['phone'],
-                'postalCodeContact' => $data['postalCode'],
-                'messageContact' => $data['message'] ?? null,
-                'imageContact' =>  $imagePath ?? null,
-                'dateContact' => $data['date'] ?? null,
-                'statusContact' => $data['status'] ?? null,
-                'nameSocietyContact' => $data['nameSociety'] ?? null,
-                'siretContact' => $data['siret'] ?? null,
-                'adressContact' => $data['adress'] ?? null,
-                'surfaceContact' => $data['surface'] ?? null ,
-                'interventionContact' => $data['intervention'] ?? null,
-                'interventionOtherContact' => $data['interventionOther'] ?? null,
-            ]);
+        // if (isset($data['emailReturn']) && $data['emailReturn'] === 'true') {
+        //     $emailReturn = (new TemplatedEmail())
+        //     ->to($data['email'])
+        //     ->from($_ENV['MAILER_TO'])
+        //     ->subject('Votre message a bien été envoyé')
+        //     ->htmlTemplate('emails/contactReturn.html.twig')
+        //     ->context([
+        //         'subjectContact' => $data['subject'],
+        //         'nameContact' => $data['name'],
+        //         'emailContact' => $data['email'],
+        //         'phoneContact' => $data['phone'] ?? null,
+        //         'postalCodeContact' => $data['postalCode'] ?? null,
+        //         'messageContact' => $data['message'] ?? null,
+        //         'imageContact' =>  $imagePath ?? null,
+        //         'dateContact' => $data['date'] ?? null,
+        //         'statusContact' => $data['status'] ?? null,
+        //         'nameSocietyContact' => $data['nameSociety'] ?? null,
+        //         'siretContact' => $data['siret'] ?? null,
+        //         'adressContact' => $data['adress'] ?? null,
+        //         'surfaceContact' => $data['surface'] ?? null ,
+        //         'interventionContact' => $data['intervention'] ?? null,
+        //         'interventionOtherContact' => $data['interventionOther'] ?? null,
+        //     ]);
 
-            $mailer->send($emailReturn);
+        //     $mailer->send($emailReturn);
             
-        }
-
-        if ($data['subject'] === 'Webmaster'  ) {
-            $data['subject'] = 'Demande de contact webmaster';
-            $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
-        }
-        else {
-            $emailTo = $_ENV['MAILER_TO'];
-        }
+        // }
+            
+        $emailTo = $_ENV['MAILER_TO'];
 
         $email = (new TemplatedEmail())
             ->to($emailTo)
@@ -129,8 +123,8 @@ class ContactController extends ApiController
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
                 'emailContact' => $data['email'],
-                'phoneContact' => $data['phone'],
-                'postalCodeContact' => $data['postalCode'],
+                'phoneContact' => $data['phone'] ?? null,
+                'postalCodeContact' => $data['postalCode'] ?? null,
                 'messageContact' => $data['message'] ?? null,
                 'imageContact' =>  $imagePath ?? null,
                 'dateContact' => $data['date'] ?? null,
@@ -170,7 +164,7 @@ class ContactController extends ApiController
 
         return $this->json(
             [
-                "erreur" => "Erreur lors de l'envoie de l'email, veuillez réessayer plus tard",
+                "erreur" => $e,
                 "code_error" => Response::HTTP_FORBIDDEN
             ],
             Response::HTTP_FORBIDDEN
