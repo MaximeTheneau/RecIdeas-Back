@@ -31,11 +31,11 @@ class Posts
     private ?string $heading = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]
-    #[Groups(['api_posts_home', 'api_posts_draft', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_blog', 'api_posts_articles_desc', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_home', 'api_posts_all', 'api_posts_draft', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_blog', 'api_posts_articles_desc', 'api_posts_keyword' ])]
     private ?string $title = null;
 
     #[ORM\Column(length: 1000)]
-    #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_draft', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_all', 'api_posts_home', 'api_posts_draft', 'api_posts_category'])]
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]

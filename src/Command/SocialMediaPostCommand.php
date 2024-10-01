@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Posts;
 use App\Service\SocialMediaService;
+use App\Service\GoogleIndexingService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,15 +22,17 @@ class SocialMediaPostCommand extends Command
 {
     private $entityManager;
     private $socialMediaService;
+    private $indexingService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         SocialMediaService $socialMediaService,
-
+        GoogleIndexingService $indexingService,
     )
     {
         $this->socialMediaService = $socialMediaService;
         $this->entityManager = $entityManager;
+        $this->indexingService = $indexingService;
 
         parent::__construct();
     }
@@ -48,7 +51,7 @@ class SocialMediaPostCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         $latestPost = $this->entityManager->getRepository(Posts::class)->findOneBy([], ['createdAt' => 'DESC']); 
-        
+        dd($success);
         $io->section('Step 1 : Facebook Page Post');
 
         $message = 'Recette du jour : ' . $latestPost->getTitle();
@@ -70,6 +73,14 @@ class SocialMediaPostCommand extends Command
             $output->writeln('Erreur lors de la publication sur Instagram: ' . $e->getMessage());
         }
 
+        // Google Search
+        try {
+            $this->indexingService->publishUrl($_ENV['DOMAIN'] . '/sitemap.xml');
+            $output->writeln('SiteMap envoyé avec succès.');
+        } catch (\Exception $e) {
+            $output->writeln('Erreur Sitemap ');
+        }
+      
         return Command::SUCCESS;
     }
 }

@@ -40,3 +40,5 @@ symfony.conf
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+/config/google/

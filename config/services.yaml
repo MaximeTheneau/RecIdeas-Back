@@ -19,6 +19,8 @@ parameters:
     #CloudFront
     amazon.s3.bucket.front:  '%env(resolve:AWS_BUCKET_FRONT)%'
 
+    #Google
+    # google.credentials.path: '%env(resolve:GOOGLE_CLOUD_CREDENTIALS_PATH)%'
 
 
 
