@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Posts;
+use App\Entity\PostsTranslation;
 use App\Service\SocialMediaService;
 use App\Service\GoogleIndexingService;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -51,9 +52,21 @@ class SocialMediaPostCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         $latestPost = $this->entityManager->getRepository(Posts::class)->findOneBy([], ['createdAt' => 'DESC']); 
-        dd($success);
         $io->section('Step 1 : Facebook Page Post');
-
+        // Google Search
+        $urlFront = 'https://' . $_ENV['NGINX_DOMAIN'] . '/' ;
+        try {
+            $this->indexingService->publishUrl($urlFront . $latestPost->getUrl());
+            // Translation
+            $translations = $this->entityManager->getRepository(PostsTranslation::class)->findBy(['post' => $latestPost]);
+            foreach ($translations as $translation) {
+                $this->indexingService->publishUrl($urlFront . $translation->getUrl());
+            }
+            
+            $output->writeln('SiteMap envoyé avec succès.');
+        } catch (\Exception $e) {
+            $output->writeln('Erreur Sitemap ');
+        }
         $message = 'Recette du jour : ' . $latestPost->getTitle();
         $imageUrl = $latestPost->getImgPost();
 
@@ -73,13 +86,7 @@ class SocialMediaPostCommand extends Command
             $output->writeln('Erreur lors de la publication sur Instagram: ' . $e->getMessage());
         }
 
-        // Google Search
-        try {
-            $this->indexingService->publishUrl($_ENV['NGINX_DOMAIN'] . '/sitemap.xml');
-            $output->writeln('SiteMap envoyé avec succès.');
-        } catch (\Exception $e) {
-            $output->writeln('Erreur Sitemap ');
-        }
+
       
         return Command::SUCCESS;
     }
