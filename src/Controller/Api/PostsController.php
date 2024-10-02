@@ -198,11 +198,31 @@ class PostsController extends ApiController
     #[Route('/all', name: 'all', methods: ['GET'])]
     public function all(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository ): JsonResponse
     {
-    
+        $langs = [ 'en', 'es', 'de', 'it'];
+        $pages = [ 'contact'];
+
+        $pageAdds = []; 
+
+        foreach ($pages as $page) { 
+            $pageAdds[] = [ 
+                'locale' => 'fr',
+                'url' => 'fr/' . $page,
+                'translations' => [] 
+            ];
+
+            foreach ($langs as $lang) {
+                $pageAdds[count($pageAdds) - 1]['translations'][] = [ 
+                    'locale' => $lang,
+                    'url' => $lang . '/' . $page,
+                ];
+            }
+        }
+
         // $postsTranslation = $postsTranslationRepository->findBy(['draft' => false]);
-        
+        $postAll = array_merge($pageAdds, $postsRepository->findAllPosts(['draft' => false]));
+            
         return $this->json(
-            $postsRepository->findAllPosts(['draft' => false]),
+            $postAll ,
             Response::HTTP_OK,
             [],
             [
