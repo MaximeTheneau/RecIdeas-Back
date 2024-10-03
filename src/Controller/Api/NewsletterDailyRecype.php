@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Comments;
 use App\Entity\Posts;
-use App\Entity\User;
+use App\Entity\UserNewsletter;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -183,14 +183,14 @@ class NewsletterDailyRecype extends ApiController
     public function verifyEmail(Request $request, HttpClientInterface $httpClient, EntityManagerInterface $entityManager): JsonResponse
     {
     $email = JSON_decode($request->getContent(), true)['email'];
-
-    try {
+    $locale = JSON_decode($request->getContent(), true)['locale'];
+    // try {
         $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
     
         $reponse = $httpClient->request('GET', $urlAPI);
         $donnees = $reponse->toArray();
         
-        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+        $existingUser = $entityManager->getRepository(UserNewsletter::class)->findOneBy(['email' => $email]);
                 
         if ($existingUser) {
     
@@ -231,14 +231,15 @@ class NewsletterDailyRecype extends ApiController
             $password = $currentDate->format('Ymd');
             $password .= random_int(1000, 9999);
 
-            $user = new User();
+            $user = new UserNewsletter();
             $user->setEmail($email);
+            $user->setLocale($locale);
             $user->setRoles(['ROLE_NEWSLETTER_DAILY']);
             $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
-
+            
             $entityManager->persist($user);
             $entityManager->flush();
-
+            
             $token = $this->jwtManager->create($user);
 
 
@@ -248,7 +249,6 @@ class NewsletterDailyRecype extends ApiController
 
             );
 
-
             $response = new JsonResponse(['message' => true]);
         
             $response->headers->setCookie($cookie);
@@ -257,9 +257,9 @@ class NewsletterDailyRecype extends ApiController
             
         }
     
-    } catch (\Exception $e) {
-        return new JsonResponse(['message' => 'Error try later'], 400);
-    }
+    // } catch (\Exception $e) {
+    //     return new JsonResponse(['message' => 'Error try later'], 400);
+    // }
 
     }
 }
