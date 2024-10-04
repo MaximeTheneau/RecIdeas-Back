@@ -262,4 +262,30 @@ class NewsletterDailyRecype extends ApiController
     // }
 
     }
+    #[Route('/unsubscribe/{id}', name: 'unsubscribe', methods: ['GET'])]
+    public function unsubscribe($id, Request $request): Response
+    {
+        $token = $request->query->get('t');
+
+        $subscriber = $this->entityManager->getRepository(UserNewsletter::class)->find($id);
+        
+        if (!$subscriber || $subscriber->getPassword() !== $token) {
+            return $this->render('api/unsubscribe/error.html.twig', [
+                'message' => 'Invalid token or user not found.',
+            ]);
+        }
+        
+        if (!$subscriber) {
+            return $this->render('api/unsubscribe/error.html.twig', [
+                'message' => 'Invalid user not found.',
+            ]);
+        }
+
+        $this->entityManager->remove($subscriber);
+        $this->entityManager->flush();
+
+        return $this->render('api/unsubscribe/success.html.twig', [
+            'message' => 'You have been successfully unsubscribed from our newsletter.',
+        ]);
+    }
 }

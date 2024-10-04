@@ -62,6 +62,8 @@ class NewsletterEmailDailyCommand extends Command
         }
 
         foreach ($subscribers as $subscriber) {
+            $encodedToken = urlencode($subscriber->getPassword());
+            $unsubscribeUrl = $_ENV['API_PATH'] . 'newsletter/unsubscribe/' . $subscriber->getId() . '?t=' . $encodedToken;
             $email = (new TemplatedEmail())
                 ->from($_ENV['MAILER_TO']) 
                 ->to($subscriber->getEmail()) 
@@ -71,7 +73,7 @@ class NewsletterEmailDailyCommand extends Command
                     'h1' => $latestPost->getTitle(),
                     'img' => $latestPost->getImgPost(),
                     'p' => $latestPost->getContents(),
-                    'unsubscribe' => $subscriber->getId(),
+                    'unsubscribe' =>  $unsubscribeUrl,
                 ]);   
 
             $this->mailer->send($email);
@@ -82,18 +84,5 @@ class NewsletterEmailDailyCommand extends Command
         return Command::SUCCESS;
     }
 
-    #[Route('/unsubscribe/{id}', name: 'unsubscribe', methods: ['GET'])]
-    public function unsubscribe($id): JsonResponse
-    {
-        $subscriber = $this->entityManager->getRepository(UserNewsletter::class)->find($id);
-
-        if (!$subscriber) {
-            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
-        }
-
-        $this->entityManager->remove($subscriber);
-        $this->entityManager->flush();
-
-        return new JsonResponse(['success' => 'Vous avez été désinscrit avec succès.']);
-    }
+    
 }
