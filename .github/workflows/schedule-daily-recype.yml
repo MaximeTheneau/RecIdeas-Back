@@ -1,4 +1,4 @@
-name: Scheduled Tests
+name: Scheduled Recype Daily
 
 on:
   workflow_dispatch:
@@ -36,3 +36,4 @@ jobs:
                 pnpm run build
                 cd /var/www/html/RecIdeas-Back
                 bin/console app:social-media-post
+                bin/console app:newsletter-email-daily
