@@ -46,8 +46,8 @@ class NewsletterEmailDailyCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('arg1');
-        $latestPost = $this->entityManager->getRepository(Posts::class)->findOneBy([], ['createdAt' => 'DESC']); 
-
+        $latestPost = $this->entityManager->getRepository(Posts::class)->findOneBy([], ['createdAt' => 'DESC']);
+        
         if (!$latestPost) {
             $io->error('Aucune recette trouvée.');
             return Command::FAILURE;
@@ -64,15 +64,20 @@ class NewsletterEmailDailyCommand extends Command
         foreach ($subscribers as $subscriber) {
             $encodedToken = urlencode($subscriber->getPassword());
             $unsubscribeUrl = $_ENV['API_PATH'] . 'newsletter/unsubscribe/' . $subscriber->getId() . '?t=' . $encodedToken;
+            $latestPostTranslation = $latestPost->getTranslations()->filter(function ($lang) use ($subscriber) {
+                return $lang->getLocale() === $subscriber->getLocale();
+            });
+
+            $post = !$latestPostTranslation->first() ? $latestPost : $latestPostTranslation->first();
             $email = (new TemplatedEmail())
-                ->from($_ENV['MAILER_TO']) 
+                ->from($_ENV['MAILER_TO_NOREPLY']) 
                 ->to($subscriber->getEmail()) 
-                ->subject($latestPost->getTitle())
+                ->subject($post->getTitle() )
                 ->htmlTemplate('emails/newsletterRecype.html.twig')
                 ->context([
-                    'h1' => $latestPost->getTitle(),
+                    'h1' =>  $post->getTitle(),
                     'img' => $latestPost->getImgPost(),
-                    'p' => $latestPost->getContents(),
+                    'p' => $post->getContents() ,
                     'unsubscribe' =>  $unsubscribeUrl,
                 ]);   
 

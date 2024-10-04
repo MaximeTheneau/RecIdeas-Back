@@ -1,4 +1,40 @@
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Rubik', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3{
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        blockquote {
+            border-left: 2px solid #007bff;
+            padding-left: 10px;
+            margin: 10px 0;
+        }
+        image {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
 <h1>{{ h1 }}</h1>
 <img src='{{ img }}' alt='Image de la recette' style='width:100%; height:auto;' />
-{{ p }}
-<p><a href='{{unsubscribe}}'>Se désinscrire</a></p>
+<div>{{ p|raw }}</div>
+
+
+<p><a href='{{unsubscribe}}'>Unsubscribe</a></p>
