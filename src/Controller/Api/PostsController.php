@@ -60,7 +60,7 @@ class PostsController extends ApiController
                 Response::HTTP_OK,
                 [],
                 [
-                    "groups" => ["api_posts_read"]
+                    "groups" => ["api_posts_home"]
                 ]
             );
         }
