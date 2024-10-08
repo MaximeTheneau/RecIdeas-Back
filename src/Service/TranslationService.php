@@ -12,6 +12,7 @@ class TranslationService
     {
         $this->translateClient = new TranslateClient([
             'key' => $_ENV['GOOGLE_API_KEY'],
+            'retries' => 2,
         ]);
     }
 
