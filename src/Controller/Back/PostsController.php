@@ -124,7 +124,7 @@ class PostsController extends AbstractController
 
 
             // SLUG
-            $slug =  $this->slugger->slug($post->getTitle());
+            $slug =   $this->createSlug($post->getTitle());
             
             $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
             $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
@@ -170,8 +170,9 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt);
             
+            
             // MARKDOWN TO HTML
-            $contentsText = $post->getContents();
+            $contentsText = $form->get('visibleContents')->getData();
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
             $post->setContents($htmlText);
 
@@ -272,10 +273,16 @@ class PostsController extends AbstractController
             
             $translations = $postsTranslationRepository->findByPostAndLanguage($post);
             
-            // MARKDOWN TO HTML
-            $contentsText = $post->getContents();
-            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
-            $post->setContents($htmlText);
+            $originalContents = $form->get('contents')->getData();
+            $contentsText = $form->get('visibleContents')->getData();
+            if ($originalContents !== $contentsText) {
+                // MARKDOWN TO HTML
+                $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+                $post->setContents($htmlText);
+                $this->entityManager->persist($post);
+                $this->entityManager->flush();
+            }
+
             
             // SLUG
             $slug = $this->createSlug($post->getTitle());
