@@ -171,7 +171,9 @@ class PostsController extends AbstractController
             $post->setFormattedDate('Publié le ' . $createdAt);
             
             // MARKDOWN TO HTML
-            $contentsText = $post->getContents();
+
+                        
+            $contentsText = $form->get('visibleContents')->getData();
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
             $post->setContents($htmlText);
 
