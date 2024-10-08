@@ -26,7 +26,7 @@ class Comments
 
     #[ORM\Column(length: 2000)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_read_translation'])]
     private ?string $comment = null;
 
     #[ORM\Column]
@@ -44,7 +44,6 @@ class Comments
     private $parent;
     
     #[ORM\OneToMany(targetEntity: Comments::class , mappedBy: 'parent', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read'])]
     private $replies;
 
     #[ORM\Column(nullable: true)]

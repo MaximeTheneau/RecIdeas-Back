@@ -67,7 +67,9 @@ class SocialMediaPostCommand extends Command
         } catch (\Exception $e) {
             $output->writeln('Erreur Sitemap ');
         }
-        $message = 'Recette du jour : ' . $latestPost->getTitle();
+        $message = 'Recette du jour : ' . $latestPost->getTitle() . "\n\n" .
+        'La recette ici : ' . $urlFront . $latestPost->getUrl();
+
         $imageUrl = $latestPost->getImgPost();
 
         // Facebook
