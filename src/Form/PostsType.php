@@ -25,12 +25,15 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class PostsType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $post = $options['data'];
+
         $builder
             ->add('draft', CheckboxType::class, [
                 'label' => 'Brouillon',
@@ -96,15 +99,22 @@ class PostsType extends AbstractType
                     'maxlength' => '135',
                     ]
             ])
-            ->add('contents', TextareaType::class, [
+            ->add('contents', HiddenType::class, [
+                'data' => $post->getContents(),
+                'mapped' => false, 
+            ])
+            ->add('visibleContents', TextareaType::class, [
                 'label' => 'Paragraphe',
                 'required' => true,
                 'attr' => [
                     'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
-                    'placeholder' => 'Paragraphe de l\'article* (max 5000 caractères) ',
+                    'placeholder' => 'Paragraphe de l\'article* (max 5000 caractères)',
                     'maxlength' => '5000',
                     'rows' => '4',
-                    ]
+                ],
+                'data' => $post->getContents(),
+                'mapped' => false, 
+
             ])
             ->add('imgPost', FileType::class, [
                 'label' => false,

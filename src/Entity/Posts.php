@@ -125,6 +125,8 @@ class Posts
     private ?string $locale = 'fr';
 
 
+
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
@@ -545,6 +547,5 @@ class Posts
 
         return $this;
     }
-
 
 }

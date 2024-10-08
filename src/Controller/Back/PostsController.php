@@ -261,212 +261,232 @@ class PostsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Posts $post, $id, PostsRepository $postsRepository, MessageBusInterface $messageBus, PostsTranslationRepository $postsTranslationRepository, ParagraphPostsRepository $paragraphPostsRepository, ParagraphPostsTranslationRepository $paragraphPostsTranslationRepository, EntityManagerInterface $em ): Response
     {
-        $imgPost = $post->getImgPost();
+       
         
+        
+        
+        $imgPost = $post->getImgPost();
+
         $articles = $postsRepository->findAll();
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
 
-        $postExist = $postsRepository->find($id);
+        $uow = $em->getUnitOfWork();
+
         if ($form->isSubmitted() && $form->isValid() ) {
             
-            $translations = $postsTranslationRepository->findByPostAndLanguage($post);
-            
-            // MARKDOWN TO HTML
-            $contentsText = $post->getContents();
-            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
-            $post->setContents($htmlText);
-            
-            // SLUG
-            $slug = $this->createSlug($post->getTitle());
-            $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
-            $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
-            if($post->getSlug() !== "home") {
-                $post->setSlug($slug);
-                
-                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
-                
-                $post->setUrl($url);
-                
-            } else {
-                $post->setSlug('home');
-                $url = '/';
-                $post->setUrl($url);
-            }
-            
-            // IMAGE Principal
-            $brochureFile = $form->get('imgPost')->getData();
-            
-            if (!empty($brochureFile)) {
-                $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
-            } else {
-                $post->setImgPost($imgPost);
-            }
-            
-            // DATE
-            $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
-            $post->setUpdatedAt(new DateTime());
-            $updatedDate = $formatter->format($post->getUpdatedAt());
-            $createdAt = $formatter->format($post->getCreatedAt());
-
-            $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
-            
-            // PARAGRAPH
-            $paragraphPosts = $form->get('paragraphPosts')->getData();
-
-            foreach ($paragraphPosts as $paragraph) {
-
+            $originalContents = $form->get('contents')->getData();
+            $contentsText = $form->get('visibleContents')->getData();
+            if ($originalContents !== $contentsText) {
                 // MARKDOWN TO HTML
-                $markdownText = $paragraph->getParagraph();
+                $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+                $post->setContents($htmlText);
+                $this->entityManager->persist($post);
+                $this->entityManager->flush();
+            }
 
-                $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
+            $uow->computeChangeSets(); 
+            $postChangeSet = $uow->getEntityChangeSet($post);
 
-                $paragraph->setParagraph($htmlText);
-
-                // LINK
-                $articleLink = $paragraph->getLinkPostSelect();
-                if ($articleLink !== null) {
+            
+            if (!empty($postChangeSet) ) {
+                $translations = $postsTranslationRepository->findByPostAndLanguage($post);
+                
+                // SLUG
+                $slug = $this->createSlug($post->getTitle());
+                $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
+                $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
+                if($post->getSlug() !== "home") {
+                    $post->setSlug($slug);
                     
-                    $paragraph->setLinkSubtitle($articleLink->getTitle());
-                    $slugLink = $articleLink->getSlug();
+                    $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
+                    
+                    $post->setUrl($url);
+                    
+                } else {
+                    $post->setSlug('home');
+                    $url = '/';
+                    $post->setUrl($url);
+                }
+                
+                // IMAGE Principal
+                $brochureFile = $form->get('imgPost')->getData();
+                
+                if (!empty($brochureFile)) {
+                    $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
+                } else {
+                    $post->setImgPost($imgPost);
+                }
+                
+                // DATE
+                $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
+                $post->setUpdatedAt(new DateTime());
+                $updatedDate = $formatter->format($post->getUpdatedAt());
+                $createdAt = $formatter->format($post->getCreatedAt());
 
-                    $categoryLink = $articleLink->getCategory()->getSlug();
-                    if ($categoryLink === "Page") {
-                        $paragraph->setLink('/'.$slugLink);
-                    }                     
-                    if ($categoryLink === "Annuaire") {
-                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
-                    } 
-                    if ($categoryLink === "Articles") {
-                        $subcategoryLink = $articleLink->getSubcategory()->getSlug();
-                        $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
+                
+                // PARAGRAPH
+                $paragraphPosts = $form->get('paragraphPosts')->getData();
+
+                foreach ($paragraphPosts as $paragraph) {
+
+                    // MARKDOWN TO HTML
+                    $markdownText = $paragraph->getParagraph();
+
+                    $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
+
+                    $paragraph->setParagraph($htmlText);
+
+                    // LINK
+                    $articleLink = $paragraph->getLinkPostSelect();
+                    if ($articleLink !== null) {
+                        
+                        $paragraph->setLinkSubtitle($articleLink->getTitle());
+                        $slugLink = $articleLink->getSlug();
+
+                        $categoryLink = $articleLink->getCategory()->getSlug();
+                        if ($categoryLink === "Page") {
+                            $paragraph->setLink('/'.$slugLink);
+                        }                     
+                        if ($categoryLink === "Annuaire") {
+                            $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
+                        } 
+                        if ($categoryLink === "Articles") {
+                            $subcategoryLink = $articleLink->getSubcategory()->getSlug();
+                            $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                        }
+                } 
+
+            
+                
+                // $deletedLink = $form['paragraphPosts'];
+
+                // if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
+                //     $paragraph->setLink(null);
+                //     $paragraph->setLinkSubtitle(null);
+                // }
+
+                // SLUG
+                if (!empty($paragraph->getSubtitle())) {
+                    $slugPara = $this->createSlug($paragraph->getSubtitle());
+                    $slugPara = substr($slugPara, 0, 30); 
+                    $paragraph->setSlug($slugPara);
+
+                } else {
+                    $this->entityManager->remove($paragraph);
+                    $this->entityManager->flush();
                     }
+
+                // IMAGE PARAGRAPH
+                if (!empty($paragraph->getImgPostParaghFile())) {
+                    $brochureFileParagraph = $paragraph->getImgPostParaghFile();
+                    $slugPara = $this->createSlug($paragraph->getSubtitle());
+                    $slugPara = substr($slugPara, 0, 30);
+                    $paragraph->setImgPostParagh($slugPara);
+                    $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
+                    
+                    // ALT IMG PARAGRAPH
+                    if (empty($paragraph->getAltImg())) {
+                        $paragraph->setAltImg($paragraph->getSubtitle());
+                    } 
+                }
             } 
 
-          
-            
-            // $deletedLink = $form['paragraphPosts'];
+                // Translations
+                foreach ($translations as $translation) {
+                    $translation->setContents($this->translationService->translateText($post->getContents(), $translation->getLocale()));
+                    $translation->setTitle($this->translationService->translateText($post->getTitle(), $translation->getLocale()));
+                    $translation->setPost($post);
+                    $translation->setDraft($post->isDraft());
 
-            // if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
-            //     $paragraph->setLink(null);
-            //     $paragraph->setLinkSubtitle(null);
-            // }
+                    // Paragraphe 
+                    $paragraphPostsCollection = $post->getParagraphPosts(); 
+                    $translationCollection = $translation->getParagraphPosts(); 
 
-            // SLUG
-            if (!empty($paragraph->getSubtitle())) {
-                $slugPara = $this->createSlug($paragraph->getSubtitle());
-                $slugPara = substr($slugPara, 0, 30); 
-                $paragraph->setSlug($slugPara);
+                    foreach ($paragraphPostsCollection as $paragraph) {
+                    
+                        $paragraphTranslation = $translationCollection->filter(function($existingTranslation) use ($paragraph, $translation) {
+                            return $existingTranslation->getParagraphPosts()->getId() === $paragraph->getId() ;
+                        })->first();
+                        
+                        if (!$paragraphTranslation) {
+                            $paragraphTranslation = new ParagraphPostsTranslation();
+                            $paragraph->addParagraphPostsTranslation($paragraphTranslation);
+                            $translation->addParagraphPost($paragraphTranslation);
+                        } 
+                        
+                        $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
+                        $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
+                        
+                        $paragraphTranslation->setParagraph($translatedParagraphContent);
+                        $paragraphTranslation->setSubtitle($translatedSubtitle);
+                        $paragraphTranslation->setSlug($this->createSlug($translatedSubtitle));
 
+                        $this->entityManager->persist($paragraphTranslation);
+
+                    }
+
+
+                    // Category
+
+                    $categoryRepository = $em->getRepository(CategoryTranslation::class);
+
+                    $pageCategory = $categoryRepository->findOneBy(['slug' => 'Page']);
+
+                    if ($post->getCategory()->getSlug() === 'Page') {
+                        $translation->setCategory($pageCategory);
+                    }
+                    else {
+                    
+                        $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($translation) {
+                            return $translations->getLocale() === $translation->getLocale();
+                        });
+                        $categoryTranslation = $categoryTranslations->first();
+        
+                        $translation->setCategory($categoryTranslation);
+                    }
+
+
+                    
+                    // SLug
+
+                    if($translation->getSlug() !== $translation->getLocale() . "home") {
+                        $translation->setSlug(
+                            $this->slugger->slug($translation->getTitle())
+                        );
+                        $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                        $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+
+                        $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
+                        $translation->setUrl($urlTranslation);
+                    }
+                    
+
+                    $translation->setFormattedDate($this->translationService->translateText('Published on ', $translation->getLocale()) . $createdAt);
+                    $translation->setLocale($translation->getLocale());
+                    $translation->setHeading($this->translationService->translateText($post->getHeading(), $translation->getLocale()));
+                    $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $translation->getLocale()));
+        
+                    $this->entityManager->persist($translation);
+                    $this->entityManager->flush();
+                }
+
+
+                $postsRepository->save($post, true);
+
+                $message = new TriggerNextJsBuild('Build');
+                $messageBus->dispatch($message);
+                
+                return $this->redirectToRoute('app_back_posts_index', [
+                ], Response::HTTP_SEE_OTHER);
             } else {
-                $this->entityManager->remove($paragraph);
-                $this->entityManager->flush();
-                }
-
-            // IMAGE PARAGRAPH
-            if (!empty($paragraph->getImgPostParaghFile())) {
-                $brochureFileParagraph = $paragraph->getImgPostParaghFile();
-                $slugPara = $this->createSlug($paragraph->getSubtitle());
-                $slugPara = substr($slugPara, 0, 30);
-                $paragraph->setImgPostParagh($slugPara);
-                $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
-                
-                // ALT IMG PARAGRAPH
-                if (empty($paragraph->getAltImg())) {
-                    $paragraph->setAltImg($paragraph->getSubtitle());
-                } 
-            }
+                return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
+            } 
+            
         } 
-
-            // Translations
-            foreach ($translations as $translation) {
-                $translation->setContents($this->translationService->translateText($post->getContents(), $translation->getLocale()));
-                $translation->setTitle($this->translationService->translateText($post->getTitle(), $translation->getLocale()));
-                $translation->setPost($post);
-                $translation->setDraft($post->isDraft());
-
-                // Paragraphe 
-                $paragraphPostsCollection = $post->getParagraphPosts(); 
-                $translationCollection = $translation->getParagraphPosts(); 
-
-                foreach ($paragraphPostsCollection as $paragraph) {
-                   
-                    $paragraphTranslation = $translationCollection->filter(function($existingTranslation) use ($paragraph, $translation) {
-                        return $existingTranslation->getParagraphPosts()->getId() === $paragraph->getId() ;
-                    })->first();
-                    
-                    if (!$paragraphTranslation) {
-                        $paragraphTranslation = new ParagraphPostsTranslation();
-                        $paragraph->addParagraphPostsTranslation($paragraphTranslation);
-                        $translation->addParagraphPost($paragraphTranslation);
-                    } 
-                    
-                    $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
-                    $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
-                    
-                    $paragraphTranslation->setParagraph($translatedParagraphContent);
-                    $paragraphTranslation->setSubtitle($translatedSubtitle);
-                    $paragraphTranslation->setSlug($this->createSlug($translatedSubtitle));
-
-                    $this->entityManager->persist($paragraphTranslation);
-
-                }
-
-
-                // Category
-
-                $categoryRepository = $em->getRepository(CategoryTranslation::class);
-
-                $pageCategory = $categoryRepository->findOneBy(['slug' => 'Page']);
-
-                if ($post->getCategory()->getSlug() === 'Page') {
-                    $translation->setCategory($pageCategory);
-                }
-                else {
-                
-                    $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($translation) {
-                        return $translations->getLocale() === $translation->getLocale();
-                    });
-                    $categoryTranslation = $categoryTranslations->first();
-    
-                    $translation->setCategory($categoryTranslation);
-                }
-
-
-                
-                // SLug
-
-                if($translation->getSlug() !== $translation->getLocale() . "home") {
-                    $translation->setSlug(
-                        $this->slugger->slug($translation->getTitle())
-                    );
-                    $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
-                    $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
-
-                    $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
-                    $translation->setUrl($urlTranslation);
-                }
-                
-
-                $translation->setFormattedDate($this->translationService->translateText('Published on ', $translation->getLocale()) . $createdAt);
-                $translation->setLocale($translation->getLocale());
-                $translation->setHeading($this->translationService->translateText($post->getHeading(), $translation->getLocale()));
-                $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $translation->getLocale()));
-    
-                $this->entityManager->persist($translation);
-                $this->entityManager->flush();
-            }
-
-
-            $postsRepository->save($post, true);
-
-            $message = new TriggerNextJsBuild('Build');
-            $messageBus->dispatch($message);
             
-            return $this->redirectToRoute('app_back_posts_index', [
-            ], Response::HTTP_SEE_OTHER);
             
-        }
         $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
         return $this->render('back/posts/edit.html.twig', [
             'post' => $post,
