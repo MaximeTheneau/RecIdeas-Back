@@ -113,16 +113,16 @@ class DailyRecypeCommand extends Command
         // Step 4: Creating Post entity
         $io->section('Step 3: Creating the post');
         $post = new Posts();
-        $post->setTitle($response['title']);
-        $post->setHeading($response['heading']);
-        $post->setMetaDescription($response['metaDescription']);
+        $post->setTitle(html_entity_decode($response['title']));
+        $post->setHeading(html_entity_decode($response['heading']));
+        $post->setMetaDescription(html_entity_decode($response['metaDescription']));
         $post->setCategory($category);
-        $post->setAltImg($response['altImg']);
+        $post->setAltImg(html_entity_decode($response['altImg']));
         $post->setLocale('fr');
         $post->setDraft(0);
         
         // Slug generation
-        $slug =  $this->slugger->slug($post->getTitle());
+        $slug =  $this->createSlug($post->getTitle());
         $post->setSlug($slug);
         $url = $this->urlGeneratorService->generatePath($slug, $post->getCategory()->getSlug(), null, 'fr');
         $post->setUrl($url);

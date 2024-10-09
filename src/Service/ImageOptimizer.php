@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -21,7 +20,6 @@ use Aws\Exception\AwsException;
 
 class ImageOptimizer
 {
-    private $slugger;
     private $params;
     private $serializer;
     private $photoDir;
@@ -31,12 +29,10 @@ class ImageOptimizer
     private const IMAGE_SIZES = [320, 640, 750, 828, 1080, 1200, 1920, 2048, 3840];
 
     public function __construct(
-        SluggerInterface $slugger,
         ContainerBagInterface $params,
         SerializerInterface $serializer,
         )
         {      
-            $this->slugger = $slugger;
             $this->params = $params;
             $this->serializer = $serializer;
             $this->photoDir =  $this->params->get('app.imgDir');
