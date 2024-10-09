@@ -124,7 +124,7 @@ class PostsController extends AbstractController
 
 
             // SLUG
-            $slug =   $this->createSlug($post->getTitle());
+            $slug = $this->createSlug($post->getTitle());
             
             $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
             $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
@@ -445,7 +445,7 @@ class PostsController extends AbstractController
 
                 if($translation->getSlug() !== $translation->getLocale() . "home") {
                     $translation->setSlug(
-                        $this->slugger->slug($translation->getTitle())
+                        $this->createSlug($translation->getTitle())
                     );
                     $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
                     $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
