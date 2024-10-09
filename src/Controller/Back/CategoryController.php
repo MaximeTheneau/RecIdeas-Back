@@ -108,13 +108,13 @@ class CategoryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Create slug 
             if($orginalCategorySlug && $orginalCategoryName !== $form->get('name')->getData() ) {
-                $slug = $this->slugger->slug($category->getName());
+                $slug = $this->createSlug($category->getName());
                 $category->setSlug($slug);
-                $slug = $this->slugger->slug($category->getName());
+                $slug = $this->createSlug($category->getName());
             }
             // Empty slug
             if(empty($category->getSlug())) {
-                $slug = $this->slugger->slug($category->getName());
+                $slug = $this->createSlug($category->getName());
                 $category->setSlug($slug);
             }            
             

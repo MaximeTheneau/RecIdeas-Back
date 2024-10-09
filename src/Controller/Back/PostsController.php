@@ -119,9 +119,6 @@ class PostsController extends AbstractController
         
         
         if ($form->isSubmitted() && $form->isValid()) {
-        
-
-
 
             // SLUG
             $slug = $this->createSlug($post->getTitle());
