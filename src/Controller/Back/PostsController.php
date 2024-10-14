@@ -281,22 +281,22 @@ class PostsController extends AbstractController
             }
 
             
-            // SLUG
-            $slug = $this->createSlug($post->getTitle());
-            $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
-            $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
-            if($post->getSlug() !== "home") {
-                $post->setSlug($slug);
+            // // SLUG
+            // $slug = $this->createSlug($post->getTitle());
+            // $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
+            // $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
+            // if($post->getSlug() !== "home") {
+            //     $post->setSlug($slug);
                 
-                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
+            //     $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug, 'fr');
                 
-                $post->setUrl($url);
+            //     $post->setUrl($url);
                 
-            } else {
-                $post->setSlug('home');
-                $url = '/';
-                $post->setUrl($url);
-            }
+            // } else {
+            //     $post->setSlug('home');
+            //     $url = '/';
+            //     $post->setUrl($url);
+            // }
             
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
@@ -440,16 +440,16 @@ class PostsController extends AbstractController
                 
                 // SLug
 
-                if($translation->getSlug() !== $translation->getLocale() . "home") {
-                    $translation->setSlug(
-                        $this->createSlug($translation->getTitle())
-                    );
-                    $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
-                    $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+                // if($translation->getSlug() !== $translation->getLocale() . "home") {
+                //     $translation->setSlug(
+                //         $this->createSlug($translation->getTitle())
+                //     );
+                //     $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                //     $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
 
-                    $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
-                    $translation->setUrl($urlTranslation);
-                }
+                //     $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $translation->getLocale());
+                //     $translation->setUrl($urlTranslation);
+                // }
                 
 
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $translation->getLocale()) . $createdAt);
