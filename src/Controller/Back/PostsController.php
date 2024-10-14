@@ -236,7 +236,7 @@ class PostsController extends AbstractController
             $postsRepository->save($post, true);
             return $this->render('back/posts/edit.html.twig', [
             'post' => $post,
-
+            'form' => $form,
             ]);
 
         }
