@@ -23,7 +23,7 @@ class Category
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_blog', 'api_posts_category_limit' ])]
     private ?string $slug = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Posts::class, cascade: ['persist', 'remove'])]

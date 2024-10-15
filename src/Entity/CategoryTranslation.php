@@ -17,15 +17,15 @@ class CategoryTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read_translation'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['api_posts_read', 'api_posts_all', 'api_posts_blog', 'api_posts_blog', 'api_posts_category', ])]
+    #[Groups(['api_posts_read_translation', 'api_posts_all', 'api_posts_blog', 'api_posts_blog', 'api_posts_category_limit' ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['api_posts_read', 'api_posts_all', 'api_posts_blog', 'api_posts_blog'])]
+    #[Groups(['api_posts_read_translation', 'api_posts_all', 'api_posts_blog', 'api_posts_blog', 'api_posts_category_limit'])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 10)]

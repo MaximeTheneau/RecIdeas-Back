@@ -155,7 +155,7 @@ class PostsController extends ApiController
         );
     }
 
-    #[Route('&limit=3&category={name}', name: 'category', methods: ['GET'])]
+    #[Route('&limit=3&category={slug}', name: 'category_limit', methods: ['GET'])]
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
         $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'ASC'], 3);
@@ -168,7 +168,7 @@ class PostsController extends ApiController
             [
                 "groups" => 
                 [
-                    "api_posts_category"
+                    "api_posts_category_limit"
 
                 ]
             ]
