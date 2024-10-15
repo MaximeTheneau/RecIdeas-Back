@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Posts;
+use App\Entity\PostsTranslation;
 use App\Entity\Category;
 use App\Entity\DailyRecype;
 use App\Entity\CategoryTranslation;
@@ -95,28 +96,45 @@ class PostsController extends ApiController
         );
     }
 
-    #[Route('&category={name}', name: 'na', methods: ['GET'])]
-    public function category(string $name, PostsRepository $postsRepository, Category $category, CategoryTranslation $categoryTranslation, PostsTranslationRepository $postsTranslationRepository): JsonResponse
+    #[Route('/category/{slug}', name: 'category', methods: ['GET'])]
+    public function category(string $slug): JsonResponse
     {
-        $posts = $postsRepository->findByCategoryExcludingHomepage($category, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
-        $postsTrans = $postsTranslationRepository->findByCategoryExcludingHomepage($categoryTranslation, ['home', 'eshome', 'enhome', 'dehome', 'ithome']);
-       
-        $data = array_merge($posts, $postsTrans);
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => $slug]);
+        $posts = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category, 'draft' => false]);
 
-        return $this->json(
-            $data,
-            Response::HTTP_OK,
-            [],
-            [
-                "groups" => 
+        if ($posts){
+            return $this->json(
+                $posts,
+                Response::HTTP_OK,
+                [],
                 [
-                    "api_posts_category"
-
+                    "groups" => 
+                    [
+                        "api_posts_category"
+    
+                    ]
                 ]
-            ]
-        );
+            );
+        }
+        $categoryTranslation = $this->entityManager->getRepository(CategoryTranslation::class)->findOneBy(['slug' => $slug]);
+        $postsTrans = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $categoryTranslation->getCategory(), 'draft' => false]);
+
+        if ($postsTrans){
+            return $this->json(
+                $postsTrans,
+                Response::HTTP_OK,
+                [],
+                [
+                    "groups" => 
+                    [
+                        "api_posts_category_translations"
+                    ]
+                ]
+            );
+        }
+        
     }
-    #[Route('/category/blog', name: 'blog', methods: ['GET'])]
+    #[Route('/category=blog', name: 'blog', methods: ['GET'])]
     public function categoryBlog(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository): JsonResponse
     {
         $posts = $postsRepository->findByCategoryExcluding('Page');
