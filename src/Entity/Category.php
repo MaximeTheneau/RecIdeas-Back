@@ -19,7 +19,7 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category_limit', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_keyword', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read', 'api_posts_category',  'api_posts_category_limit', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_keyword', 'api_posts_blog' ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
