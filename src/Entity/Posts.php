@@ -56,7 +56,7 @@ class Posts
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_read', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read', 'api_posts_blog', 'api_posts_category_limit' ])]
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
