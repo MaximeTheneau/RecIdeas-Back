@@ -100,7 +100,7 @@ class PostsController extends ApiController
     public function category(string $slug): JsonResponse
     {
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => $slug]);
-        $posts = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category, 'draft' => false]);
+        $posts = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category, 'draft' => false],  ['createdAt' => 'DESC']);
 
         if ($posts){
             return $this->json(
@@ -117,7 +117,7 @@ class PostsController extends ApiController
             );
         }
         $categoryTranslation = $this->entityManager->getRepository(CategoryTranslation::class)->findOneBy(['slug' => $slug]);
-        $postsTrans = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $categoryTranslation->getCategory(), 'draft' => false]);
+        $postsTrans = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $categoryTranslation->getCategory(), 'draft' => false],  ['createdAt' => 'DESC']);
 
         if ($postsTrans){
             return $this->json(
