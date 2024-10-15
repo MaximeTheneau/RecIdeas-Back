@@ -158,7 +158,7 @@ class PostsController extends ApiController
     #[Route('&limit=3&category={slug}', name: 'category_limit', methods: ['GET'])]
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'ASC'], 3);
+        $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'DESC'], 3);
 
 
         return $this->json(
