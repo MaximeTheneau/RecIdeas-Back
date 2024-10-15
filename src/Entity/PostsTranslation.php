@@ -48,7 +48,7 @@ class PostsTranslation
     private ?string $contents = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_read_translation', 'api_posts_blog'])]
+    #[Groups(['api_posts_read_translation', 'api_posts_blog', 'api_posts_category_limit'])]
     private ?string $formattedDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
