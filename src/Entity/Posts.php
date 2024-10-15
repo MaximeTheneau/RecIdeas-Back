@@ -39,7 +39,7 @@ class Posts
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]
-    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category_limit', 'api_posts_blog', 'api_posts_keyword', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_blog', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
@@ -94,7 +94,7 @@ class Posts
     private Collection $keywords;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_blog', 'api_posts_read','api_posts_read_translation', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
+    #[Groups(['api_posts_all', 'api_posts_category_limit', 'api_posts_desc', 'api_posts_blog', 'api_posts_read','api_posts_read_translation', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
