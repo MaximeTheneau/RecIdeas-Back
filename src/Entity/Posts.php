@@ -23,7 +23,7 @@ class Posts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_read_translation', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword', 'api_posts_home' ])]
+    #[Groups(['api_posts_read', 'api_posts_read_translation', 'api_posts_desc',  'api_posts_keyword', 'api_posts_home' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
@@ -31,7 +31,7 @@ class Posts
     private ?string $heading = null;
     
     #[ORM\Column(length: 70, type: Types::STRING)]
-    #[Groups(['api_posts_home', 'api_posts_all', 'api_posts_draft', 'api_posts_read', 'api_posts_desc', 'api_posts_category_limit', 'api_posts_blog', 'api_posts_articles_desc', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_home', 'api_posts_all', 'api_posts_draft', 'api_posts_read', 'api_posts_desc', 'api_posts_category_limit', 'api_posts_category', 'api_posts_blog', 'api_posts_articles_desc', 'api_posts_keyword' ])]
     private ?string $title = null;
 
     #[ORM\Column(length: 1000)]
@@ -48,7 +48,7 @@ class Posts
     private ?string $contents = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_category','api_posts_read_translation', 'api_posts_all', 'api_posts_category_limit', 'api_posts_blog' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_category_translations', 'api_posts_read_translation', 'api_posts_all', 'api_posts_category_limit', 'api_posts_blog' ])]
     private ?\DateTime $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -56,7 +56,7 @@ class Posts
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_read', 'api_posts_blog', 'api_posts_category_limit' ])]
+    #[Groups(['api_posts_read', 'api_posts_blog', 'api_posts_category_limit', 'api_posts_category' ])]
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -70,7 +70,7 @@ class Posts
     private ?string $textLinks = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_desc', 'api_posts_blog', 'api_posts_category_limit','api_posts_keyword' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_desc', 'api_posts_blog', 'api_posts_category_limit','api_posts_keyword', 'api_posts_category_translations', ])]
     private ?Category $category = null;
 
     #[ORM\Column(length: 125, nullable: true)]
@@ -78,11 +78,11 @@ class Posts
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_read_translation', 'api_posts_draft',  'api_posts_desc', 'api_posts_blog', 'api_posts_category_limit', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home' ])]
+    #[Groups(['api_posts_read', 'api_posts_read_translation', 'api_posts_draft',  'api_posts_desc', 'api_posts_category_translations', 'api_posts_blog', 'api_posts_category_limit', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home','api_posts_category'])]
     private ?string $imgPost = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups([ 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword'])]
+    #[Groups([ 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword'])]
     private ?Subcategory $subcategory = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: Comments::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -94,7 +94,7 @@ class Posts
     private Collection $keywords;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_posts_all', 'api_posts_category_limit', 'api_posts_desc', 'api_posts_blog', 'api_posts_read','api_posts_read_translation', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
+    #[Groups(['api_posts_all', 'api_posts_category_limit', 'api_posts_desc', 'api_posts_blog', 'api_posts_read','api_posts_read_translation', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home', 'api_posts_category'  ])]
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
@@ -113,7 +113,7 @@ class Posts
     private ?string $srcset = null;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostsTranslation::class, cascade: ['persist', 'remove'])]
-    #[Groups([ 'api_posts_read', 'api_posts_read_translation', 'api_posts_all', 'api_posts_category_limit' ])]
+    #[Groups([ 'api_posts_read', 'api_posts_read_translation', 'api_posts_all', 'api_posts_category_limit', 'api_posts_category', 'api_posts_category_translations'])]
     private Collection $translations;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -121,7 +121,7 @@ class Posts
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_read_translation', 'api_posts_category_limit', 'api_posts_draft', 'api_posts_all', 'api_posts_blog'])]
+    #[Groups(['api_posts_read',  'api_posts_category_translations', 'api_posts_read_translation', 'api_posts_category_limit', 'api_posts_draft', 'api_posts_all', 'api_posts_blog', 'api_posts_category'])]
     private ?string $locale = 'fr';
 
 
