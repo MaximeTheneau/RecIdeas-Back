@@ -222,6 +222,7 @@ class PostsController extends AbstractController
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
                 $translation->setLocale($locale);
                 $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
+                $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $locale));
                 $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
     
                 $this->entityManager->persist($translation);
@@ -456,6 +457,7 @@ class PostsController extends AbstractController
                 $translation->setLocale($translation->getLocale());
                 $translation->setHeading($this->translationService->translateText($post->getHeading(), $translation->getLocale()));
                 $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $translation->getLocale()));
+                $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $translation->getLocale()));
     
                 $this->entityManager->persist($translation);
                 $this->entityManager->flush();

@@ -170,6 +170,7 @@ class DailyRecypeCommand extends Command
             $translation = new PostsTranslation();
             $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
             $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
+            $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $locale));
             $translation->setPost($post);
             
             // Category
