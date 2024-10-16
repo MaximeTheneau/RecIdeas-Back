@@ -58,7 +58,7 @@ class PostsTranslation
     private ?string $textLinks = null;
 
     #[ORM\Column(length: 125, nullable: true)]
-    #[Groups(['api_posts_category', 'api_posts_home', 'api_posts_read_translation',  'api_posts_desc', 'api_posts_keyword', 'api_posts_category', 'api_posts_subcategory'])]
+    #[Groups(['api_posts_category', 'api_posts_category_translations', 'api_posts_category_limit', 'api_posts_home', 'api_posts_read_translation',  'api_posts_desc', 'api_posts_keyword', 'api_posts_category', 'api_posts_subcategory'])]
     private ?string $altImg = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
