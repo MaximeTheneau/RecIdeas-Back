@@ -25,6 +25,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use \IntlDateFormatter;
 use DateTime;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 #[AsCommand(
     name: 'app:daily-recype',
