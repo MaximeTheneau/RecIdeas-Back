@@ -149,8 +149,7 @@ class ContactController extends ApiController
             Response::HTTP_OK,
         );
                 
-        }
-    catch (\Exception $e) {
+        } catch (\Exception $e) {
         $email = (new TemplatedEmail())
         ->to($_ENV['MAILER_TO_WEBMASTER'])
         ->from($_ENV['MAILER_TO'])

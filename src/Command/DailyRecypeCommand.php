@@ -86,143 +86,170 @@ class DailyRecypeCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Daily Recipe Generation Process');
 
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
-
-        $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
+        try {
         
-        $io->section('Step 1: Last recype');
-        $titles = array_map(fn($recipe) => $recipe->getTitle(), $listRecype);
-        $titlesString = implode(', ', $titles);
-
-        $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
-        $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le contents (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
         
-        // Step 3: Fetching response from OpenAI
-        $io->section('Step 2: Fetching response from OpenAI');
-        $responseJson = $this->openaiApiService->prompt(
-            $prompt,
-            false,
-            'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : json {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}'
-        );
-        preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
-        $jsonContent = $matches[1]; 
-        $response = json_decode($jsonContent, true);
-        
-        $io->text('Recipe generated: ' . $response['title']);
 
-        // Step 4: Creating Post entity
-        $io->section('Step 3: Creating the post');
-        $post = new Posts();
-        $post->setTitle(html_entity_decode($response['title']));
-        $post->setHeading(html_entity_decode($response['heading']));
-        $post->setMetaDescription(html_entity_decode($response['metaDescription']));
-        $post->setCategory($category);
-        $post->setAltImg(html_entity_decode($response['altImg']));
-        $post->setLocale('fr');
-        $post->setDraft(0);
-        
-        // Slug generation
-        $slug =  $this->createSlug($post->getTitle());
-        $post->setSlug($slug);
-        $url = $this->urlGeneratorService->generatePath($slug, $post->getCategory()->getSlug(), null, 'fr');
-        $post->setUrl($url);
-        
-        // DATE
-        $post->setCreatedAt(new DateTime());
-        $createdAt = $formatter->format($post->getCreatedAt());
-        $post->setFormattedDate('Publié le ' . $createdAt);
+            $category = $this->entityManager->getRepository(Category::class)->findOneBy(['slug' => 'recette-du-jour']);
 
-        // Step 5: Converting Markdown to HTML
-        $io->section('Step 4: Converting markdown to HTML');
-        $contentsText = $response['contents'];
-        $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
-        $post->setContents($htmlText);
-
-        $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
-        
-        $imageJson = $this->openaiApiImageService->prompt(
-            'Créer une Photo aérienne réaliste et appétissante pour la recette : ' . $post->getTitle() . '  avec un léger filtre pour rehausser les couleurs et textures.'
-        );
-
-        // Step 6: Fetching and optimizing the image
-        $imageContent = file_get_contents($imageJson);
-        $localImagePath = $this->params->get('app.imgDir') . 'dailyRecipe.webp'; 
-        file_put_contents($localImagePath, $imageContent);
-        
-        $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
-
-        unlink($localImagePath);
-
-
-        // Step 7: Updating the DailyRecype
-        $io->section('Step 5: Updating the DailyRecype entity');
-        // $dailyRecype = new DailyRecype;
-        $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
-        $dailyRecype->setTitle($post->getTitle());
-        $dailyRecype->setUrl($post->getUrl());
-        $dailyRecype->setLocale('fr');
-        $this->entityManager->persist($dailyRecype);
-
-        // Step 8: Translating content
-        $io->section('Step 6: Translating content');
-        $io->progressStart(count($this->translations));
-        foreach ($this->translations as $locale) {
-            $translation = new PostsTranslation();
-            $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
-            $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
-            $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $locale));
-            $translation->setPost($post);
+            $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
             
-            // Category
-            $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($locale) {
-                return $translations->getLocale() === $locale;
-            });
-            $categoryTranslation = $categoryTranslations->first();
+            $io->section('Step 1: Last recype');
+            $titles = array_map(fn($recipe) => $recipe->getTitle(), $listRecype);
+            $titlesString = implode(', ', $titles);
 
-            $translation->setCategory($categoryTranslation);
-
-            // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
-
-            // SLug 
-            $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
-            $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
-
-            $translation->setSlug(
-                $this->createSlug(
-                $this->translationService->translateText($post->getSlug(), $locale)
-            ));
-            $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
-            $translation->setUrl($urlTranslation);
-          
-            // Daily Recype
-            $dailyRecypeTranslation = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
-            // $dailyRecypeTranslation = new DailyRecype;
-            $dailyRecypeTranslation->setTitle($translation->getTitle());
-            $dailyRecypeTranslation->setUrl($translation->getUrl());
-            $dailyRecypeTranslation->setLocale($locale);
-
-            // Date 
-            $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
-            $translation->setLocale($locale);
-            $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
-            $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
-
-            $this->entityManager->persist($translation);
-            $this->entityManager->persist($dailyRecypeTranslation);
+            $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
+            $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le contents (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
             
-            $io->progressAdvance();
-        }
-    
-        $io->progressFinish();
+            // Step 3: Fetching response from OpenAI
+            $io->section('Step 2: Fetching response from OpenAI');
+            $responseJson = $this->openaiApiService->prompt(
+                $prompt,
+                false,
+                'Tu es un assistant de cuisine qui aide à générer des recettes au format JSON seulement : json {\"heading\": \"...\", \"title\": \"...\", \"metaDescription\": \"...\", \"contents\": \"...\", \"altImg\": \"...\"}'
+            );
+            preg_match('/```json\n(.*?)\n```/s', $responseJson, $matches);
+            $jsonContent = $matches[1]; 
+            $response = json_decode($jsonContent, true);
+            
+            $io->text('Recipe generated: ' . $response['title']);
+
+            // Step 4: Creating Post entity
+            $io->section('Step 3: Creating the post');
+            $post = new Posts();
+            $post->setTitle(html_entity_decode($response['title']));
+            $post->setHeading(html_entity_decode($response['heading']));
+            $post->setMetaDescription(html_entity_decode($response['metaDescription']));
+            $post->setCategory($category);
+            $post->setAltImg(html_entity_decode($response['altImg']));
+            $post->setLocale('fr');
+            $post->setDraft(0);
+            
+            // Slug generation
+            $slug =  $this->createSlug($post->getTitle());
+            $post->setSlug($slug);
+            $url = $this->urlGeneratorService->generatePath($slug, $post->getCategory()->getSlug(), null, 'fr');
+            $post->setUrl($url);
+            
+            // DATE
+            $post->setCreatedAt(new DateTime());
+            $createdAt = $formatter->format($post->getCreatedAt());
+            $post->setFormattedDate('Publié le ' . $createdAt);
+
+            // Step 5: Converting Markdown to HTML
+            $io->section('Step 4: Converting markdown to HTML');
+            $contentsText = $response['contents'];
+            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+            $post->setContents($htmlText);
+
+            $listRecype = $this->entityManager->getRepository(Posts::class)->findBy(['category' => $category]);
+            
+            $imageJson = $this->openaiApiImageService->prompt(
+                'Créer une Photo aérienne réaliste et appétissante pour la recette : ' . $post->getTitle() . '  avec un léger filtre pour rehausser les couleurs et textures.'
+            );
+
+            // Step 6: Fetching and optimizing the image
+            $imageContent = file_get_contents($imageJson);
+            $localImagePath = $this->params->get('app.imgDir') . 'dailyRecipe.webp'; 
+            file_put_contents($localImagePath, $imageContent);
+            
+            $this->imageOptimizer->setPicture($localImagePath, $post, $slug);
+
+            unlink($localImagePath);
+
+
+            // Step 7: Updating the DailyRecype
+            $io->section('Step 5: Updating the DailyRecype entity');
+            // $dailyRecype = new DailyRecype;
+            $dailyRecype = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => 'fr']);
+            $dailyRecype->setTitle($post->getTitle());
+            $dailyRecype->setUrl($post->getUrl());
+            $dailyRecype->setLocale('fr');
+            $this->entityManager->persist($dailyRecype);
+
+            // Step 8: Translating content
+            $io->section('Step 6: Translating content');
+            $io->progressStart(count($this->translations));
+            foreach ($this->translations as $locale) {
+                $translation = new PostsTranslation();
+                $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
+                $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
+                $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $locale));
+                $translation->setPost($post);
+                
+                // Category
+                $categoryTranslations = $post->getCategory()->getCategoryTranslations()->filter(function ($translations) use ($locale) {
+                    return $translations->getLocale() === $locale;
+                });
+                $categoryTranslation = $categoryTranslations->first();
+
+                $translation->setCategory($categoryTranslation);
+
+                // $translation->setSubCategory($this->translationService->translateText($post->getSubCategory(), $locale));
+
+                // SLug 
+                $categorySlug = $translation->getCategory() ? $translation->getCategory()->getSlug() : null;
+                $subcategorySlug = $translation->getSubcategory() ? $translation->getSubcategory()->getSlug() : null;
+
+                $translation->setSlug(
+                    $this->createSlug(
+                    $this->translationService->translateText($post->getSlug(), $locale)
+                ));
+                $urlTranslation = $this->urlGeneratorService->generatePath($translation->getSlug(), $categorySlug, $subcategorySlug, $locale);
+                $translation->setUrl($urlTranslation);
+            
+                // Daily Recype
+                $dailyRecypeTranslation = $this->entityManager->getRepository(DailyRecype::class)->findOneBy(['locale' => $locale]);
+                // $dailyRecypeTranslation = new DailyRecype;
+                $dailyRecypeTranslation->setTitle($translation->getTitle());
+                $dailyRecypeTranslation->setUrl($translation->getUrl());
+                $dailyRecypeTranslation->setLocale($locale);
+
+                // Date 
+                $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
+                $translation->setLocale($locale);
+                $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
+                $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
+
+                $this->entityManager->persist($translation);
+                $this->entityManager->persist($dailyRecypeTranslation);
+                
+                $io->progressAdvance();
+            }
         
-        // Step 9: Saving the new post
-        $io->section('Step 7: Saving the new post');
-        $this->entityManager->persist($post);
+            $io->progressFinish();
+            
+            // Step 9: Saving the new post
+            $io->section('Step 7: Saving the new post');
+            $this->entityManager->persist($post);
 
-        $this->entityManager->flush();
+            $this->entityManager->flush();
 
-        $io->success('Daily recipe has been successfully generated and saved!');
+            $io->success('Daily recipe has been successfully generated and saved!');
 
-        return Command::SUCCESS;
+        
+            return Command::SUCCESS;
+        
+        } catch (\Exception $e) {
+            $email = (new TemplatedEmail())
+            ->to($_ENV['MAILER_TO_WEBMASTER'])
+            ->from($_ENV['MAILER_TO'])
+            ->subject('Erreur lors de l\'envoie de l\'email')
+            ->htmlTemplate('emails/error.html.twig')
+            ->context([
+                'error' => $e->getMessage(),
+            ]);
+            $mailer->send($email);
+
+
+            return $this->json(
+                [
+                    "erreur" => $e,
+                    "code_error" => Response::HTTP_FORBIDDEN
+                ],
+                Response::HTTP_FORBIDDEN
+            );
+    }
+      
     }
 }
