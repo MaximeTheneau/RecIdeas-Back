@@ -102,7 +102,7 @@ class DailyRecypeCommand extends Command
             $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
             $prompt ='Génère une recette d\'un plats populaire et de saison à la date du ' . (new \DateTime())->format('Y-m-d') . ' avec un title de 60 caractères max, un heading de 60 caractères max et une metaDescription de 130 caractères max, le contents (recette) doit être sous forme de markdown sans titre juste la recette en h2 les sous-titre et inclure une courte introduction. Le altImg doit être concis. Assure-toi que la recette générée ne duplique pas celles-ci : : coq au vin, ' . $titlesString;
             
-            // Step 3: Fetching response from OpenAI
+            // Step 2: Fetching response from OpenAI
             $io->section('Step 2: Fetching response from OpenAI');
             $responseJson = $this->openaiApiService->prompt(
                 $prompt,
@@ -115,7 +115,7 @@ class DailyRecypeCommand extends Command
             
             $io->text('Recipe generated: ' . $response['title']);
 
-            // Step 4: Creating Post entity
+            // Step 3: Creating Post entity
             $io->section('Step 3: Creating the post');
             $post = new Posts();
             $post->setTitle(html_entity_decode($response['title']));
@@ -137,7 +137,7 @@ class DailyRecypeCommand extends Command
             $createdAt = $formatter->format($post->getCreatedAt());
             $post->setFormattedDate('Publié le ' . $createdAt);
 
-            // Step 5: Converting Markdown to HTML
+            // Step 4: Converting Markdown to HTML
             $io->section('Step 4: Converting markdown to HTML');
             $contentsText = $response['contents'];
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
