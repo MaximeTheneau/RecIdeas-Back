@@ -35,7 +35,6 @@ use Doctrine\ORM\EntityManagerInterface;
 #[Route(
     path: '/api/posts',
     name: 'api_posts_',
-
 )]
 class PostsController extends ApiController
 {
