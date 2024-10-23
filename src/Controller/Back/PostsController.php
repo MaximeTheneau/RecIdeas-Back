@@ -303,7 +303,7 @@ class PostsController extends AbstractController
             $brochureFile = $form->get('imgPost')->getData();
             
             if (!empty($brochureFile)) {
-                $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
+                $this->imageOptimizer->setPicture($brochureFile, $post, $post->getSlug());
             } else {
                 $post->setImgPost($imgPost);
             }
