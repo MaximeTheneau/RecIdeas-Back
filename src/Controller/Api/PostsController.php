@@ -222,6 +222,7 @@ class PostsController extends ApiController
 
         foreach ($pages as $page) { 
             $pageAdds[] = [ 
+                'title' => $page,
                 'locale' => 'fr',
                 'url' => 'fr/' . $page,
                 'translations' => [] 
