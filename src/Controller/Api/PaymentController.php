@@ -12,8 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route(
-    path: '/api',
-    name: 'api_',
+    path: '/api/payment',
+    name: 'api_payment',
 )]
 class PaymentController extends ApiController
 {
@@ -52,19 +52,24 @@ class PaymentController extends ApiController
                     ],
                     'quantity' => 1,
                 ]],
+                'metadata' => [
+                    'name' => $name,
+                    'message' => $message,
+                ],
+                'locale' => $locale,
                 'mode' => 'payment',
                 'success_url' => $_ENV['DOMAIN_FRONT'] . $locale . '/dons?status=success',
                 'cancel_url' => $_ENV['DOMAIN_FRONT'] .  $locale . '/dons?status=error',
             ]);
 
-            $donor = new Donor();
-            $donor->setName(!empty($name) ? $name : 'Anonymous');
-            $donor->setMessage($message);
-            $donor->setAmount($amount);
-            $donor->setLocale($locale);
+            // $donor = new Donor();
+            // $donor->setName(!empty($name) ? $name : 'Anonymous');
+            // $donor->setMessage($message);
+            // $donor->setAmount($amount);
+            // $donor->setLocale($locale);
 
-            $this->entityManager->persist($donor);
-            $this->entityManager->flush();
+            // $this->entityManager->persist($donor);
+            // $this->entityManager->flush();
 
             return new JsonResponse(['id' => $session->id]);
         } catch (\Exception $e) {
@@ -88,5 +93,43 @@ class PaymentController extends ApiController
         }, $donors);
 
         return new JsonResponse($donorData);
+    }
+
+    #[Route('/webhook', name: '_webhook', methods: ['POST'])]
+    public function webhook(Request $request): Response
+    {
+        $endpoint_secret = $_ENV['STRIPE_WEBHOOK_SECRET'];
+
+        $payload = $request->getContent();
+        $sig_header = $request->headers->get('Stripe-Signature');
+
+        try {
+            $event = Webhook::constructEvent(
+                $payload,
+                $sig_header,
+                $endpoint_secret
+            );
+        } catch (SignatureVerificationException $e) {
+            return new Response('Signature invalid', 400);
+        }
+
+        if ($event->type === 'checkout.session.completed') {
+            $session = $event->data->object; 
+
+            $amount = $session->amount_total / 100; 
+            $locale = $session->locale;
+            $metadata = $session->metadata;
+
+            $donor = new Donor();
+            $donor->setName($metadata->name ?: 'Anonymous');
+            $donor->setMessage($metadata->message);
+            $donor->setAmount($amount);
+            $donor->setLocale($locale);
+
+            $this->entityManager->persist($donor);
+            $this->entityManager->flush();
+        }
+
+        return new Response('Success', 200);
     }
 }
