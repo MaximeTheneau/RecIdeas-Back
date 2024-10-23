@@ -216,7 +216,7 @@ class PostsController extends ApiController
     public function all(PostsRepository $postsRepository, PostsTranslationRepository $postsTranslationRepository ): JsonResponse
     {
         $langs = [ 'en', 'es', 'de', 'it'];
-        $pages = [ 'contact'];
+        $pages = [ 'contact', 'dons'];
 
         $pageAdds = []; 
 
