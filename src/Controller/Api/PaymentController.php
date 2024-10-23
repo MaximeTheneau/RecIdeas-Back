@@ -64,15 +64,6 @@ class PaymentController extends ApiController
                 'cancel_url' => $_ENV['DOMAIN_FRONT'] .  $locale . '/dons?status=error',
             ]);
 
-            // $donor = new Donor();
-            // $donor->setName(!empty($name) ? $name : 'Anonymous');
-            // $donor->setMessage($message);
-            // $donor->setAmount($amount);
-            // $donor->setLocale($locale);
-
-            // $this->entityManager->persist($donor);
-            // $this->entityManager->flush();
-
             return new JsonResponse(['id' => $session->id]);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
