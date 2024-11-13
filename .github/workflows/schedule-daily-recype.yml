@@ -1,39 +1,38 @@
-name: Scheduled Recype Daily
+# name: Scheduled Recype Daily
+# 
+# on:
+#   workflow_dispatch:
+#   schedule:
+#     - cron: "0 6 * * *"
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * *"
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '20.*' 
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.*' 
-
-      - name: 'Random Delai'
-        run: |
-          SECONDS=$(( RANDOM % 3600 ))
-          sleep $SECONDS  
+#       - name: 'Random Delai'
+#         run: |
+#           SECONDS=$(( RANDOM % 3600 ))
+#           sleep $SECONDS  
       
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-            host: ${{ secrets.HOST }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.KEY }}
-            script: |
-                cd /var/www/html/RecIdeas-Back
-                bin/console app:daily-recype
-                cd /var/www/html/RecIdeas-Front
-                pnpm run build
-                cd /var/www/html/RecIdeas-Back
-                bin/console app:social-media-post
-                bin/console app:newsletter-email-daily
+#       - name: executing remote ssh commands using password
+#         uses: appleboy/ssh-action@v1.0.3
+#         with:
+#             host: ${{ secrets.HOST }}
+#             username: ${{ secrets.USERNAME }}
+#             key: ${{ secrets.KEY }}
+#             script: |
+#                 cd /var/www/html/RecIdeas-Back
+#                 bin/console app:daily-recype
+#                 cd /var/www/html/RecIdeas-Front
+#                 pnpm run build
+#                 cd /var/www/html/RecIdeas-Back
+#                 bin/console app:social-media-post
+#                 bin/console app:newsletter-email-daily
