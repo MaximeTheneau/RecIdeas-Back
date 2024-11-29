@@ -7,17 +7,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-
 
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
-#[ApiRessource(
-    normalizationContext: ['groups' => ['api_posts_keyword']],
-)]
 class Posts
 {
     #[ORM\Id]
@@ -43,7 +35,6 @@ class Posts
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
-    #[Type(type: Types::string)]
     #[Groups(['api_posts_read', 'api_posts_home', 'api_posts_draft'])]
     private ?string $contents = null;
 

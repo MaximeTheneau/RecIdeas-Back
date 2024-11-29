@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\Comments;
-use App\Entity\Posts;
 use App\Entity\User;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
@@ -13,17 +12,13 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\NamedAddress;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
 use DateTime;
 
@@ -67,11 +62,6 @@ class CommentsController extends ApiController
             return new JsonResponse(['message' => 'Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer ultérieurement.'], 400);
         }
         
-
-
-
-
-
 
             $data = json_decode($content, true);
 
