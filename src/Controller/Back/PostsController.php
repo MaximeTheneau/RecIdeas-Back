@@ -5,81 +5,57 @@ namespace App\Controller\Back;
 use App\Entity\Posts;
 use App\Entity\Category;
 use App\Entity\CategoryTranslation;
-use App\Entity\ListPosts;
-use App\Entity\ParagraphPosts;
-use App\Entity\Keyword;
 use App\Entity\PostsTranslation;
 use App\Entity\ParagraphPostsTranslation;
 use App\Form\PostsType;
-use App\Form\ParagraphPostsType;
 use App\Message\TriggerNextJsBuild;
 use App\Repository\PostsRepository;
 use App\Repository\PostsTranslationRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\ParagraphPostsRepository;
 use App\Repository\ParagraphPostsTranslationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use DateTime;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use App\Service\ImageOptimizer;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
 use App\Service\TranslationService;
-use Symfony\Component\String\UnicodeString;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use App\Service\TranslationServiceDecode;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
 {
-    private $params;
     private $imageOptimizer;
     private $slugger;
-    private $photoDir;
-    private $projectDir;
     private $entityManager;
-    private $markdown;
     private $markdownProcessor;
     private $urlGeneratorService;
     private $translationService;
+    private $translationServiceDecode;
 
     public function __construct(
-        ContainerBagInterface $params,
         ImageOptimizer $imageOptimizer,
         SluggerInterface $slugger,
         EntityManagerInterface $entityManager,
         MarkdownProcessor $markdownProcessor,
         UrlGeneratorService $urlGeneratorService,
-        TranslationService $translationService
+        TranslationService $translationService,
+        TranslationServiceDecode $translationServiceDecode,
     )
     {
-        $this->params = $params;
         $this->entityManager = $entityManager;
         $this->imageOptimizer = $imageOptimizer;
         $this->slugger = $slugger;
-        $this->projectDir =  $this->params->get('app.projectDir');
-        $this->photoDir =  $this->params->get('app.imgDir');
-        $this->markdown = new MarkdownExtra();
         $this->markdownProcessor = $markdownProcessor;
         $this->urlGeneratorService = $urlGeneratorService;
         $this->translationService = $translationService;
+        $this->translationServiceDecode = $translationServiceDecode;
         $this->translations = [ 'es', 'en', 'it', 'de' ];
 
     }
@@ -177,7 +153,7 @@ class PostsController extends AbstractController
             foreach ($this->translations as $locale) {
                 $translation = new PostsTranslation();
                 $translation->setContents($this->translationService->translateText($post->getContents(), $locale));
-                $translation->setTitle($this->translationService->translateText($post->getTitle(), $locale));
+                $translation->setTitle($this->translationServiceDecode->translateText($post->getTitle(), $locale));
                 $translation->setPost($post);
                 
                 // Category
@@ -221,9 +197,9 @@ class PostsController extends AbstractController
 
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $locale) . $createdAt);
                 $translation->setLocale($locale);
-                $translation->setHeading($this->translationService->translateText($post->getHeading(), $locale));
-                $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $locale));
-                $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $locale));
+                $translation->setHeading($this->translationServiceDecode->translateText($post->getHeading(), $locale));
+                $translation->setAltImg($this->translationServiceDecode->translateText($post->getAltImg(), $locale));
+                $translation->setMetaDescription($this->translationServiceDecode->translateText($post->getMetaDescription(), $locale));
     
                 $this->entityManager->persist($translation);
             }
@@ -386,7 +362,7 @@ class PostsController extends AbstractController
             // Translations
             foreach ($translations as $translation) {
                 $translation->setContents($this->translationService->translateText($post->getContents(), $translation->getLocale()));
-                $translation->setTitle($this->translationService->translateText($post->getTitle(), $translation->getLocale()));
+                $translation->setTitle($this->translationServiceDecode->translateText($post->getTitle(), $translation->getLocale()));
                 $translation->setPost($post);
                 $translation->setDraft($post->isDraft());
 
@@ -407,7 +383,7 @@ class PostsController extends AbstractController
                     } 
                     
                     $translatedParagraphContent = $this->translationService->translateText($paragraph->getParagraph(), $translation->getLocale());
-                    $translatedSubtitle = $this->translationService->translateText($paragraph->getSubtitle(), $translation->getLocale());
+                    $translatedSubtitle = $this->translationServiceDecode->translateText($paragraph->getSubtitle(), $translation->getLocale());
                     
                     $paragraphTranslation->setParagraph($translatedParagraphContent);
                     $paragraphTranslation->setSubtitle($translatedSubtitle);
@@ -455,9 +431,9 @@ class PostsController extends AbstractController
 
                 $translation->setFormattedDate($this->translationService->translateText('Published on ', $translation->getLocale()) . $createdAt);
                 $translation->setLocale($translation->getLocale());
-                $translation->setHeading($this->translationService->translateText($post->getHeading(), $translation->getLocale()));
-                $translation->setMetaDescription($this->translationService->translateText($post->getMetaDescription(), $translation->getLocale()));
-                $translation->setAltImg($this->translationService->translateText($post->getAltImg(), $translation->getLocale()));
+                $translation->setHeading($this->translationServiceDecode->translateText($post->getHeading(), $translation->getLocale()));
+                $translation->setMetaDescription($this->translationServiceDecode->translateText($post->getMetaDescription(), $translation->getLocale()));
+                $translation->setAltImg($this->translationServiceDecode->translateText($post->getAltImg(), $translation->getLocale()));
     
                 $this->entityManager->persist($translation);
                 $this->entityManager->flush();

@@ -1,5 +1,5 @@
 # name: Scheduled Recype Daily
-# 
+#
 # on:
 #   workflow_dispatch:
 #   schedule:
