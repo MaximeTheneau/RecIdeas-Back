@@ -18,10 +18,8 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           cd /var/www/html/RecIdeas-Back
-          
           git stash
           git pull
           bin/console ma:mi
           bin/console d:m:m
-          bin/console app:decode
           bin/console c:c
