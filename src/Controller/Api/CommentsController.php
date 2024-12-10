@@ -169,7 +169,7 @@ class CommentsController extends ApiController
 
     }
 
-    #[Route('/verify_email', name: 'verify', methods: ['POST'])]
+    #[Route('/verify_email', methods: ['POST'])]
     public function verifyEmail(Request $request, HttpClientInterface $httpClient, EntityManagerInterface $entityManager): JsonResponse
     {
     $email = JSON_decode($request->getContent(), true)['email'];
