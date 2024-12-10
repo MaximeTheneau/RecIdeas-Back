@@ -19,7 +19,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use DateTime;
 
 #[Route('/api/comments')]
@@ -29,17 +29,20 @@ class CommentsController extends ApiController
     private $passwordHasher;
     private $jwtManager;
     private $tokenStorage;
+    private $JWTEncoderInterface;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager, 
         JWTTokenManagerInterface $jwtManager, 
+        JWTEncoderInterface $JWTEncoderInterface, 
         TokenStorageInterface $tokenStorage,
     )
     {
         $this->passwordHasher = $passwordHasher;
         $this->entityManager = $entityManager;
         $this->jwtManager = $jwtManager;
+        $this->JWTEncoderInterface = $JWTEncoderInterface;
         $this->tokenStorage = $tokenStorage;
     }
 
@@ -51,9 +54,9 @@ class CommentsController extends ApiController
         $content = $request->getContent();
 
         $cookie = $request->cookies->get('jwt');
-        $token = new JWTUserToken();
-        $token->setRawToken($cookie);
-        $tokenData = $this->jwtManager->decode($token);
+        $jwtToken = $request->cookies->get('jwt');
+
+        $tokenData = $this->JWTEncoderInterface->decode($jwtToken);
 
         $user = $tokenData['username'];
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
